@@ -11,7 +11,9 @@ import javax.validation.constraints.NotEmpty;
 public class MemberDto {
     @NotEmpty(message = "ID 필수")
     private String userId;
+    @NotEmpty(message = "pw 필수")
     private String password;
+    @NotEmpty(message = "email 필수")
     private String userEmail;
 
     public Member toEntity(){

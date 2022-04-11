@@ -1,6 +1,7 @@
 package com.mytube.service;
 
 
+import com.mytube.Controller.MemberDto;
 import com.mytube.domain.Member;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,35 @@ public class memberService {
     @Transactional
     public Long join(Member member){
         log.info("Join member = "+member);
-        validateDuplicateMember(member); //중복 회원 검증
         memberRepository.save(member);
         return member.getId();
     }
+
+    public List<Member> findMembers(){
+        return memberRepository.findAll();
+    }
+
+    public void checkUserIdDuplication(MemberDto dto) {
+        boolean userIdDuplicate = memberRepository.existsByUserId(dto.getUserId());
+        if (userIdDuplicate) {
+            throw new IllegalStateException("이미 존재하는 ID입니다.");
+        }
+    }
+    public void checkUserEmailDuplication(MemberDto dto) {
+        boolean userEmailDuplicate = memberRepository.existsByUserId(dto.getUserEmail());
+        if (userEmailDuplicate) {
+            throw new IllegalStateException("이미 존재하는 Email입니다.");
+        }
+    }
+
+
     private void validateDuplicateMember(Member member) {
         Member findMember = memberRepository.findMemberByUserId(member.getUserId());
-        if (!(findMember==null)) {
+        if (!(findMember==null) ){
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
+
+
+
 }
