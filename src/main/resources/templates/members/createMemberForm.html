@@ -4,11 +4,18 @@
 <style>
     .field-Error {
         border-color: #bd2130;
+        color: #dc3545;
     }
 </style>
 <body>
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+    <div class="py-5 text-center">
+        <h2>회원 가입</h2>
+    </div>
+    <h5 class="mb-4">회원 정보 입력</h5>
+    <hr class="my-4">
+
     <form role="form" action="/members/new" th:object="${memberDto}" method="post">
 
         <div class="form-group">

@@ -11,6 +11,8 @@ spring:
     properties:
       # show_sql: true
       format_sql: true
+  session:
+    timeout: 30m
 logging.level:
   org.hibernate.SQL: debug
   # org.hibernate.type: trace
