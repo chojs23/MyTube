@@ -1,6 +1,8 @@
 package com.mytube.Controller;
 
 
+import com.mytube.Controller.form.MemberJoinForm;
+import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.domain.Member;
 import com.mytube.service.memberService;
 import com.mytube.web.SessionConst;
@@ -9,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,62 +28,61 @@ public class MemberController {
 
     private final memberService memberService;
 
-    @GetMapping("/members/new")
-    public String createForm(Model model) {
-        model.addAttribute("memberDto", new MemberDto());
-        return "members/createMemberForm";
-    }
-
     @GetMapping("/members")
     public String showMembers(Model model) {
         List<Member> members = memberService.findMembers();
         model.addAttribute("members", members);
         return "members/memberList";
     }
+
+    @GetMapping("/members/new")
+    public String createForm(Model model) {
+        model.addAttribute("form", new MemberJoinForm());
+        return "members/createMemberForm";
+    }
+
+
     @PostMapping("/members/new")
-    public String createMember(@Valid MemberDto dto, BindingResult result, Model model) {
+    public String createMember(@Valid @ModelAttribute("form") MemberJoinForm form, BindingResult result, Model model) {
+
+        if(memberService.checkUserIdDuplication(form)){
+            log.info("Duplicated ID ={}",form.getUserId());
+            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
+        }
+        if(memberService.checkUserEmailDuplication(form)){
+            log.info("Duplicated Email ={}",form.getUserEmail());
+            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
+        }
+
         if (result.hasErrors()) {
+            log.info("errors={}", result);
             return "members/createMemberForm";
         }
 
-        try {
-            memberService.checkUserIdDuplication(dto);
-        } catch (IllegalStateException e) {
-            model.addAttribute("DuplicateUserId", true);
-            return "members/createMemberForm";
-        }
-
-        try {
-            memberService.checkUserEmailDuplication(dto);
-        } catch (IllegalStateException e) {
-            model.addAttribute("DuplicateUserEmail", true);
-            return "members/createMemberForm";
-        }
-
-        Member member = dto.toEntity();
+        Member member = form.toEntity();
         memberService.join(member);
         return "redirect:/";
     }
 
     @GetMapping("members/login")
-    public String loginForm(@ModelAttribute("LoginDto") LoginDto dto) {
+    public String loginForm(@ModelAttribute("form") MemberLoginForm form) {
         return "members/memberLoginForm";
     }
 
     @PostMapping("members/login")
-    public String login(@Valid @ModelAttribute LoginDto dto, BindingResult bindingResult, HttpServletRequest request) {
+    public String login(@Valid @ModelAttribute("form") MemberLoginForm form, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
             return "members/memberLoginForm";
         }
-        Member loginMember = memberService.login(dto.getMemberId(), dto.getPassword());
+        Member loginMember = memberService.login(form.getUserId(), form.getPassword());
         log.info("login? {}", loginMember);
         if (loginMember == null) {
             log.info("null login");
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
             return "members/memberLoginForm";
         }
-        //로그인 성공 처리 TODO
 
+        //로그인 성공 처리 TODO
         //세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관

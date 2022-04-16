@@ -19,16 +19,16 @@
     <div class="py-5 text-center">
         <h2>로그인</h2>
     </div>
-    <form action="members/login" th:action th:object="${LoginDto}" method="post">
+    <form action="members/login" th:action th:object="${form}" method="post">
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}"
                th:text="${err}">전체 오류 메시지</p>
         </div>
         <div>
             <label for="loginId">로그인 ID</label>
-            <input type="text" id="loginId" th:field="*{memberId}" class="formcontrol"
+            <input type="text" id="loginId" th:field="*{userId}" class="formcontrol"
                    th:errorclass="field-error">
-            <div class="field-error" th:errors="*{memberId}" />
+            <div class="field-error" th:errors="*{userId}" />
         </div>
         <div>
             <label for="password">비밀번호</label>
@@ -45,7 +45,7 @@
             </div>
             <div class="col">
                 <button class="w-100 btn btn-secondary btn-lg"
-                        onclick="location.href='items.html'"
+                        onclick="location.href='/'"
                         th:onclick="|location.href='@{/}'|"
                         type="button">취소</button>
             </div>

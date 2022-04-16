@@ -16,30 +16,36 @@
     <h5 class="mb-4">회원 정보 입력</h5>
     <hr class="my-4">
 
-    <form role="form" action="/members/new" th:object="${memberDto}" method="post">
+    <form role="form" action="/members/new" th:object="${form}" method="post">
 
         <div class="form-group">
             <label th:for="userId">USER ID</label>
             <input type="text" th:field="*{userId}" class="form-control" placeholder="ID를 입력하세요"
-                   th:class="${#fields.hasErrors('userId')}? 'form-control fieldError' : 'form-control'">
-            <p th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">Incorrect date</p>
-            <p th:text="'중복ID 존재'" th:if="${DuplicateUserId}" >Incorrect date</p>
+                   th:errorclass="field-Error">
+            <div class="field-Error" th:errors="*{userId}">
+                아이디 오류
+            </div>
+
+
         </div>
 
         <div class="form-group">
             <label th:for="password">password</label>
-            <input type="text" th:field="*{password}" class="form-control"  placeholder="password를 입력하세요"
-                   th:class="${#fields.hasErrors('password')}?'form-control fieldError':'form-control'">
-            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect date</p>
+            <input type="password" th:field="*{password}" class="form-control"  placeholder="password를 입력하세요"
+                   th:errorclass="field-Error">
+            <div class="field-Error" th:errors="*{password}">
+                비밀번호 오류
+            </div>
         </div>
 
         <div class="form-group">
             <label th:for="userEmail">email</label>
             <input type="text" th:field="*{userEmail}" class="form-control"
                    placeholder="Email을 입력하세요"
-                   th:class="${#fields.hasErrors('userEmail')}?'form-control fieldError':'form-control'">
-            <p th:if="${#fields.hasErrors('userEmail')}" th:errors="*{userEmail}">Incorrect date</p>
-            <p th:if="${DuplicateUserEmail}" th:text="'중복 Email 존재'">Incorrect date</p>
+                   th:errorclass="field-Error">
+            <div class="field-Error" th:errors="*{userEmail}">
+                이메일 오류
+            </div>
 
         </div>
 
