@@ -4,6 +4,8 @@ package com.mytube.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,6 +23,9 @@ public class Member {
     private String password;
     @Column(nullable = false,unique = true,length =45)
     private String userEmail;
+
+    @OneToMany(mappedBy = "member")
+    private List<Post> posts=new ArrayList<>();
 
 
     @Builder
