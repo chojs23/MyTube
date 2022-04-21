@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -20,5 +22,9 @@ public class PostService {
         log.info("new post = "+post);
         postRepository.save(post);
         return post.getId();
+    }
+
+    public List<Post> getAllPosts(){
+        return postRepository.findAll();
     }
 }

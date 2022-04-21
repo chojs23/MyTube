@@ -1,11 +1,34 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <title>Hello</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<head th:replace="fragments/header :: header">
+  <title>MyTube</title>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-Hello
-<a href="/">Home</a>
+<div class="container" style="max-width: 600px">
+  <div th:replace="fragments/bodyHeader :: bodyHeader" />
+  <div class="py-5 text-center">
+    <a href="/"><h2>MyTube</h2></a>
+  </div>
+  <div class="row">
+    <div class="col">
+      <button class="w-100 btn btn-secondary btn-lg" type="button"
+              th:onclick="|location.href='@{/members/new}'|">
+        회원 가입
+      </button>
+    </div>
+    <div class="col">
+      <button class="w-100 btn btn-dark btn-lg"
+              onclick="location.href='/home'"
+              th:onclick="|location.href='@{/members/login}'|" type="button">
+        로그인
+      </button>
+    </div>
+  </div>
+  <hr class="my-4">
+  <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
 </body>
 </html>

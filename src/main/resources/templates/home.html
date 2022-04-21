@@ -12,15 +12,32 @@
     <div class="py-5 text-center">
         <a href="/"><h2>MyTube</h2></a>
     </div>
-    <div class="row">
+
+    <div class="row pb-2">
         <div class="col">
             <button class="w-100 btn btn-secondary btn-lg" type="button"
+                    th:onclick="|location.href='@{/posts}'|">
+                글 게시판으로
+            </button>
+        </div>
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg" type="button"
+                    th:onclick="|location.href='@{/videos}'|">
+                동영상 게시판으로
+            </button>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn btn-info btn-lg" type="button"
                     th:onclick="|location.href='@{/members/new}'|">
                 회원 가입
             </button>
         </div>
         <div class="col">
-            <button class="w-100 btn btn-dark btn-lg"
+            <button class="w-100 btn btn-primary btn-lg"
                     onclick="location.href='/home'"
                     th:onclick="|location.href='@{/members/login}'|" type="button">
                 로그인

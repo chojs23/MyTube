@@ -22,18 +22,22 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostRepository postRepository;
+
     private final PostService postService;
 
     @GetMapping("/posts")
     public String posts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,Model model){
-        model.addAttribute("member", loginMember);
+        model.addAttribute("loginMember", loginMember);
+
+        List<Post> posts = postService.getAllPosts();
+        model.addAttribute("posts",posts);
         return "/posts/posts";
     }
 
@@ -47,6 +51,9 @@ public class PostController {
     @PostMapping("/posts/new")
     public String createPost(@Valid @ModelAttribute PostCreateForm form, BindingResult result, Model model,
                              @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+        if (loginMember==null){
+            return "redirect:/home";
+        }
 
         if (result.hasErrors()) {
             log.info("errors={}", result);
@@ -58,5 +65,6 @@ public class PostController {
         log.info("post id = " + postId);
         return "redirect:/posts";
     }
+
 
 }
