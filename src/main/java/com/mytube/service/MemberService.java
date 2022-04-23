@@ -6,6 +6,9 @@ import com.mytube.domain.Member;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class memberService {
+public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -32,9 +35,14 @@ public class memberService {
         }
         return findMember.getPassword().equals(password)?findMember:null;
     }
-
+    /**
     public List<Member> findMembers(){
         return memberRepository.findAll();
+    }
+     */
+
+    public Page<Member> getMemberPage(Pageable pageable){
+        return memberRepository.findAll(pageable);
     }
 
     public boolean checkUserIdDuplication(MemberJoinForm form) {
@@ -44,14 +52,6 @@ public class memberService {
         return memberRepository.existsByUserEmail(form.getUserEmail());
     }
 
-
-
-    private void validateDuplicateMember(Member member) {
-        Member findMember = memberRepository.findMemberByUserId(member.getUserId());
-        if (!(findMember==null) ){
-            throw new IllegalStateException("이미 존재하는 회원입니다.");
-        }
-    }
 
 
 

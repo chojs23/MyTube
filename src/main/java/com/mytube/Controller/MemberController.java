@@ -4,34 +4,55 @@ package com.mytube.Controller;
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.domain.Member;
-import com.mytube.service.memberService;
+import com.mytube.dto.memberDto;
+import com.mytube.service.MemberService;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.awt.print.Pageable;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final memberService memberService;
+    private final MemberService memberService;
+
+    //@GetMapping("/members")
+    public String showMembers(Model model) {
+        //List<Member> members = memberService.findMembers();
+        //model.addAttribute("members", members);
+        return "members/memberList";
+    }
 
     @GetMapping("/members")
-    public String showMembers(Model model) {
-        List<Member> members = memberService.findMembers();
-        model.addAttribute("members", members);
+    public String showMembers2(@RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy,Model model) {
+        Page<Member> members = memberService.getMemberPage(PageRequest.of(
+                page.orElse(0),
+                3,
+                Sort.Direction.ASC,sortBy.orElse("id")
+        ));
+        //Page<memberDto> members = memberPage.map(m -> new memberDto(m.getId(),m.getUserId(),m.getUserEmail(),m.getCreatedDate()));
+        //List<Member> members = memberPage.getContent();
+        int totalPages = members.getTotalPages();
+        model.addAttribute("page",page);
+        model.addAttribute("totalPages",totalPages);
+
+        model.addAttribute("members",members);
         return "members/memberList";
     }
 
@@ -84,10 +105,11 @@ public class MemberController {
 
         //로그인 성공 처리 TODO
         //세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
+
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관
-        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
     }
     @PostMapping("/members/logout")

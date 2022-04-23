@@ -1,6 +1,7 @@
 package com.mytube.domain;
 
 
+import com.mytube.domain.BaseEntities.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id","userId","password","userEmail"})
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)

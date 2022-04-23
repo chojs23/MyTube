@@ -1,8 +1,13 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<head th:replace="fragments/header :: header">
+    <title>Members</title>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="css/bootstrap.min.css" rel="stylesheet">
+</head>
 <body>
-<div class="container">
+<div class="container" style="max-width: 1000px">
     <div th:replace="fragments/bodyHeader :: bodyHeader" />
     <div>
         <table class="table table-striped">
@@ -11,6 +16,8 @@
                 <th>#</th>
                 <th>이름</th>
                 <th>Email</th>
+                <th>생성일자</th>
+                <th>정보보기</th>
             </tr>
             </thead>
             <tbody>
@@ -18,10 +25,23 @@
                 <td th:text="${member.id}"></td>
                 <td th:text="${member.userId}"></td>
                 <td th:text="${member.userEmail}"></td>
+                <td th:text="${member.createdDate}"></td>
+
             </tr>
             </tbody>
         </table>
     </div>
+
+    <div th:if="${totalPages != 0}" class="text-center">
+        <ul class="pagination">
+            <li th:each="page : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:href="@{/members(page=${pageStat.index})}" th:text="${pageStat.index + 1}"></a>
+                &nbsp;
+            </li>
+        </ul>
+    </div>
+
+
     <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
 </body>
