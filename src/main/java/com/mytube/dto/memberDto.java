@@ -1,5 +1,6 @@
 package com.mytube.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 
 @Data
+@AllArgsConstructor
 public class memberDto {
     private Long id;
 
@@ -15,12 +17,7 @@ public class memberDto {
 
     private String userEmail;
 
-    private LocalDateTime createdDate;
+    private String createdDate;
 
-    public memberDto(Long id, String userId, String userEmail, LocalDateTime createdDate) {
-        this.id = id;
-        this.userId = userId;
-        this.userEmail = userEmail;
-        this.createdDate = createdDate;
-    }
+
 }

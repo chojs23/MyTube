@@ -6,11 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Data
 public class PostCreateForm {
-    @NotEmpty(message = "글제목 필수")
+    @NotBlank(message = "글제목 필수")
     private String title;
 
     @NotEmpty(message = "내용 필수")

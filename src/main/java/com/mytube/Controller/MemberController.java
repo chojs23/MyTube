@@ -3,6 +3,7 @@ package com.mytube.Controller;
 
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
+import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.domain.Member;
 import com.mytube.dto.memberDto;
 import com.mytube.service.MemberService;
@@ -41,16 +42,15 @@ public class MemberController {
 
     @GetMapping("/members")
     public String showMembers2(@RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy,Model model) {
-        Page<Member> members = memberService.getMemberPage(PageRequest.of(
+        Page<Member> memberPage = memberService.getMemberPage(PageRequest.of(
                 page.orElse(0),
-                3,
-                Sort.Direction.ASC,sortBy.orElse("id")
+                10,
+                Sort.Direction.DESC,sortBy.orElse("id")
         ));
-        //Page<memberDto> members = memberPage.map(m -> new memberDto(m.getId(),m.getUserId(),m.getUserEmail(),m.getCreatedDate()));
+
+        Page<memberDto> members = memberPage.map(m -> new memberDto(m.getId(),m.getUserId(),m.getUserEmail(),m.getCreatedDate()));
+        log.info("members ={}", members);
         //List<Member> members = memberPage.getContent();
-        int totalPages = members.getTotalPages();
-        model.addAttribute("page",page);
-        model.addAttribute("totalPages",totalPages);
 
         model.addAttribute("members",members);
         return "members/memberList";
@@ -81,7 +81,57 @@ public class MemberController {
         }
 
         Member member = form.toEntity();
+
         memberService.join(member);
+        return "redirect:/";
+    }
+
+    @GetMapping("members/{id}/update")
+    public String updateForm(@PathVariable Long id,Model model,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+        if (!id.equals(loginMember.getId())){
+            return "redirect:/";
+        }
+        Optional<Member> findMember = memberService.findMember(id);
+        if(findMember.isEmpty()){
+            log.info("update member err");
+            return "/home";
+        }
+        Member member = findMember.get();
+        MemberUpdateForm form = new MemberUpdateForm();
+
+        form.setUserId(member.getUserId());
+        form.setUserEmail(member.getUserEmail());
+        model.addAttribute("form", form);
+
+        return "members/memberUpdateForm";
+    }
+    @PostMapping("members/{id}/update")
+    public String update(@PathVariable Long id,Model model,@ModelAttribute("form") MemberUpdateForm form,BindingResult result,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+
+        if (!id.equals(loginMember.getId())){
+            return "redirect:/";
+        }
+        if(!loginMember.getUserId().equals(form.getUserId()) && memberService.checkUserIdDuplication(form)){
+            log.info("Duplicated ID ={}",form.getUserId());
+            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
+        }
+        if(!loginMember.getUserEmail().equals(form.getUserEmail()) &&memberService.checkUserEmailDuplication(form)){
+            log.info("Duplicated Email ={}",form.getUserEmail());
+            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
+        }
+        if (result.hasErrors()) {
+            log.info("errors={}", result);
+            return "members/memberUpdateForm";
+        }
+        boolean b = memberService.updateMember(id, form);
+
+        if (!b){
+            log.info("update member err");
+            return "members/memberUpdateForm";
+        }
+
         return "redirect:/";
     }
 

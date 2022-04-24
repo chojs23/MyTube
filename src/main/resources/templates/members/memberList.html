@@ -3,7 +3,7 @@
 <head th:replace="fragments/header :: header">
     <title>Members</title>
     <meta charset="utf-8">
-    <link th:href="@{/css/bootstrap.min.css}"
+    <link th:href="@{/css/bootstrap.rtl.css}"
           href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -32,9 +32,9 @@
         </table>
     </div>
 
-    <div th:if="${totalPages != 0}" class="text-center">
+    <div th:if="${members.totalPages != 0}" class="text-center">
         <ul class="pagination">
-            <li th:each="page : ${#numbers.sequence(0, totalPages - 1)}">
+            <li th:each="page : ${#numbers.sequence(0, members.totalPages - 1)}">
                 <a th:href="@{/members(page=${pageStat.index})}" th:text="${pageStat.index + 1}"></a>
                 &nbsp;
             </li>

@@ -1,18 +1,19 @@
 package com.mytube.service;
 
 
+import com.mytube.Controller.form.MemberForm;
 import com.mytube.Controller.form.MemberJoinForm;
+import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.domain.Member;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,10 +46,36 @@ public class MemberService {
         return memberRepository.findAll(pageable);
     }
 
-    public boolean checkUserIdDuplication(MemberJoinForm form) {
+    public Optional<Member> findMember(Long id){
+        return memberRepository.findById(id);
+    }
+
+    @Transactional
+    public boolean updateMember(Long id, MemberUpdateForm form){
+        Optional<Member> findMember = memberRepository.findById(id);
+
+        if(!findMember.isPresent()){
+            log.info("isPresent false");
+            return false;
+        }
+        Member member = findMember.get();
+        log.info("member = " + member);
+
+        if (!member.getPassword().equals(form.getOldPassword())){
+            log.info("oldPassword err");
+            return false;
+        }
+
+        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail());
+        Member save = memberRepository.save(member);
+        log.info("save = " + save);
+        return true;
+    }
+
+    public boolean checkUserIdDuplication(MemberForm form) {
         return memberRepository.existsByUserId(form.getUserId());
     }
-    public boolean checkUserEmailDuplication(MemberJoinForm form) {
+    public boolean checkUserEmailDuplication(MemberForm form) {
         return memberRepository.existsByUserEmail(form.getUserEmail());
     }
 
