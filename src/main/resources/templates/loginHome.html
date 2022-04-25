@@ -56,12 +56,12 @@
             </button>
         </div>
         <div class="col">
-            <form th:action="@{/members/logout}" method="post">
-                <button class="w-70 btn btn-danger btn-lg"
-                        onclick="location.href='/'" type="submit">
-                    로그아웃
+
+                <button class="w-70 btn btn-success btn-lg"
+                        th:onclick="|location.href='@{/members/{id}/info (id=${loginMember.id})}'|">
+                    내 정보 보기
                 </button>
-            </form>
+
         </div>
     </div>
     <hr class="my-4">

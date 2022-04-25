@@ -1,14 +1,16 @@
 package com.mytube.Controller.form;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberForm {
-    @NotEmpty(message = "ID 필수")
     private String userId;
 
-    @NotEmpty(message = "Email 필수")
     private String userEmail;
 }

@@ -22,6 +22,7 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
 
+
     @Transactional
     public Long join(Member member){
         log.info("Join member = "+member);

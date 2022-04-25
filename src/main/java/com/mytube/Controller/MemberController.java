@@ -1,6 +1,7 @@
 package com.mytube.Controller;
 
 
+import com.mytube.Controller.form.MemberForm;
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.Controller.form.MemberUpdateForm;
@@ -86,6 +87,18 @@ public class MemberController {
         return "redirect:/";
     }
 
+    @GetMapping("members/{id}/info")
+    public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
+                       @PathVariable Long id) {
+        if (!id.equals(loginMember.getId())){
+            return "redirect:/";
+        }
+        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail());
+        model.addAttribute("form",memberForm);
+        model.addAttribute("loginMember",loginMember);
+        return "/members/memberInfo";
+    }
+
     @GetMapping("members/{id}/update")
     public String updateForm(@PathVariable Long id,Model model,
                              @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
@@ -106,9 +119,17 @@ public class MemberController {
 
         return "members/memberUpdateForm";
     }
+
+    /**
+     * 사용자가 자신의 정보를 수정하면 세션에 유지중인 loginMember 에는 값이 반영안됨
+     * 그래서 또 다음 수정할때 오류발생
+     * 해결 -> 세션에 유지중인 loginMember 을 수정된 새로운 Member 로 갱신
+     * Or 그냥 수정하면 로그아웃시키기 ?
+     */
     @PostMapping("members/{id}/update")
     public String update(@PathVariable Long id,Model model,@ModelAttribute("form") MemberUpdateForm form,BindingResult result,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         HttpServletRequest request){
 
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
@@ -121,6 +142,10 @@ public class MemberController {
             log.info("Duplicated Email ={}",form.getUserEmail());
             result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
         }
+        if(!loginMember.getPassword().equals(form.getOldPassword())){
+            log.info("OldPassword Error ={}",form.getOldPassword());
+            result.addError(new FieldError("form","oldPassword",form.getOldPassword(),false,null,null,"기존 비밀번호를 잘못입력하였습니다."));
+        }
         if (result.hasErrors()) {
             log.info("errors={}", result);
             return "members/memberUpdateForm";
@@ -131,6 +156,11 @@ public class MemberController {
             log.info("update member err");
             return "members/memberUpdateForm";
         }
+
+        HttpSession session = request.getSession();
+        //세션에 로그인 회원 정보 보관
+
+        session.setAttribute(SessionConst.LOGIN_MEMBER, memberService.findMember(loginMember.getId()).get());
 
         return "redirect:/";
     }

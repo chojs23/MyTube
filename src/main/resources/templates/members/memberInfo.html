@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+    <div class="py-5 text-center">
+        <h2>내 정보</h2>
+    </div>
+
+    <div th:object="${form}">
+        <div>
+            <label for="userId">UserId</label>
+            <input type="text" id="userId" th:field="*{userId}" class="form-control" disabled>
+
+        </div>
+        <div>
+            <label for="userEmail">Email</label>
+            <input type="text" id="userEmail" th:field="*{userEmail}"
+                   class="form-control"
+                   disabled>
+
+        </div>
+        <hr class="my-4">
+        <div class="row">
+            <div class="col">
+                <button class="w-100 btn btn-secondary btn-lg" type="button"
+                        th:onclick="|location.href='@{/members/{id}/update (id=${loginMember.id})}'|">
+                    내 정보 수정
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div> <!-- /container -->
+</body>
+</html>
