@@ -80,5 +80,22 @@ public class PostController {
 
     }
 
+    @GetMapping("/posts/{id}/detail")
+    public String postDetail(@PathVariable Long id, Model model) {
+        Optional<Post> post = postService.getPost(id);
+
+        if (post.isEmpty()){
+            log.info("PostDetail => Empty post");
+            return "redirect:/posts";
+        }
+        Post findPost = post.get();
+        postDto postDto = new postDto(findPost.getId(), findPost.getTitle(), findPost.getContent(),
+                findPost.getMember(), findPost.getCreatedDate(), findPost.getLastModifiedDate());
+        model.addAttribute("postDto", postDto);
+
+        return "/posts/postDetail";
+
+    }
+
 
 }

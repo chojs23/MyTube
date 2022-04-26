@@ -1,7 +1,6 @@
 package com.mytube.service;
 
 
-import com.mytube.domain.Member;
 import com.mytube.domain.Post;
 import com.mytube.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,10 @@ public class PostService {
         log.info("new post = "+post);
         postRepository.save(post);
         return post.getId();
+    }
+
+    public Optional<Post> getPost(Long id){
+        return postRepository.findById(id);
     }
 
     public List<Post> getAllPosts(){

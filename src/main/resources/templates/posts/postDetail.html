@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+    <div class="py-5 text-center">
+        <h2>Post Detail</h2>
+    </div>
+
+    <div th:object="${postDto}">
+        <div>
+            <label for="title">제목</label>
+            <input type="text" id="title" th:field="*{title}" class="form-control" disabled>
+
+        </div>
+        <div>
+            <label for="content">내용</label>
+            <textarea  rows="8" type="text" id="content" th:field="*{content}"
+                   class="form-control"
+                   disabled>
+                </textarea>
+        </div>
+
+    </div>
+</div> <!-- /container -->
+</body>
+</html>
