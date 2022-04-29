@@ -2,6 +2,7 @@ package com.mytube.Controller;
 
 
 import com.mytube.Controller.form.MemberJoinForm;
+import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.Controller.form.PostCreateForm;
 import com.mytube.domain.Member;
 import com.mytube.domain.Post;
@@ -45,7 +46,7 @@ public class PostController {
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
         Page<postDto> posts = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
-
+        log.info("posts = " + posts);
         model.addAttribute("posts",posts);
 
         return "posts/posts";
@@ -81,7 +82,8 @@ public class PostController {
     }
 
     @GetMapping("/posts/{id}/detail")
-    public String postDetail(@PathVariable Long id, Model model) {
+    public String postDetail(@PathVariable Long id, Model model,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
         Optional<Post> post = postService.getPost(id);
 
         if (post.isEmpty()){
@@ -91,11 +93,60 @@ public class PostController {
         Post findPost = post.get();
         postDto postDto = new postDto(findPost.getId(), findPost.getTitle(), findPost.getContent(),
                 findPost.getMember(), findPost.getCreatedDate(), findPost.getLastModifiedDate());
+
         model.addAttribute("postDto", postDto);
+        model.addAttribute("loginMember", loginMember);
 
         return "/posts/postDetail";
 
     }
+    @GetMapping("/posts/{id}/update")
+    public String UpdatePostForm(@PathVariable Long id, Model model,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+        Optional<Post> post = postService.getPost(id);
+        if (post.isEmpty()){
+            log.info("PostDetail => Empty post");
+            return "redirect:/posts";
+        }
+
+        if (loginMember==null || !loginMember.getId().equals(post.get().getMember().getId())){
+            return "redirect:/posts/{id}/detail";
+        }
 
 
+        Post findPost = post.get();
+        PostCreateForm postCreateForm = new PostCreateForm(findPost.getTitle(), findPost.getContent(), findPost.getMember());
+        model.addAttribute("form", postCreateForm);
+        model.addAttribute("loginMember", loginMember);
+
+
+        return "/posts/updatePostForm";
+    }
+
+    @PostMapping("/posts/{id}/update")
+    public String UpdatePost(@PathVariable Long id,@Valid @ModelAttribute("form") PostCreateForm form,BindingResult result,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+
+        if (result.hasErrors()) {
+            log.info("errors={}", result);
+            return "posts/updatePostForm";
+        }
+
+        Optional<Post> post = postService.getPost(id);
+        if (post.isEmpty()){
+            log.info("PostDetail => Empty post");
+            return "redirect:/posts";
+        }
+        postService.updatePost(id, form);
+
+        return "redirect:/posts/{id}/detail";
+    }
+
+    @GetMapping("/posts/{id}/delete")
+    public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+        Post post = postService.deletePost(id);
+
+        log.info("del post = " + post);
+        return "redirect:/posts";
+    }
 }

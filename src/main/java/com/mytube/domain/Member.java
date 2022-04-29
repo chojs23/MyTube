@@ -25,6 +25,8 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,unique = true,length =45)
     private String userEmail;
 
+
+
     @OneToMany(mappedBy = "member")
     private List<Post> posts=new ArrayList<>();
 

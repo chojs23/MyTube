@@ -36,6 +36,31 @@
             </div>
 
         </div>
+        <div class="row">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일자</th>
+                    <th>수정일자</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="post:${form.posts}">
+                    <tr>
+                        <td th:text="${post.id}">
+                        <td ><a th:href="@{/posts/{id}/detail (id=${post.getId()})}" th:text="${post.title}"></a></td>
+                        <td th:text="${post.member.userId}"></td>
+                        <td th:text="${post.createdDate}"></td>
+                        <td th:text="${post.lastModifiedDate}"></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div> <!-- /container -->
 </body>

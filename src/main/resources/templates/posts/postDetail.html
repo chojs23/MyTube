@@ -26,7 +26,10 @@
                    disabled>
                 </textarea>
         </div>
-
+        <div th:if="${loginMember} != null and ${loginMember.id}==*{member.id} " th:class="form-control">
+            <a th:href="@{/posts/{id}/update (id=*{id})}" th:text="수정하기"></a>
+            <a th:href="@{/posts/{id}/delete (id=*{id})}" th:text="삭제하기"></a>
+        </div>
     </div>
 </div> <!-- /container -->
 </body>

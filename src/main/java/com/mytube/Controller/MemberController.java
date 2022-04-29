@@ -6,8 +6,10 @@ import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.domain.Member;
+import com.mytube.domain.Post;
 import com.mytube.dto.memberDto;
 import com.mytube.service.MemberService;
+import com.mytube.service.PostService;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,7 @@ import java.util.Optional;
 public class MemberController {
 
     private final MemberService memberService;
-
+    private final PostService postService;
     //@GetMapping("/members")
     public String showMembers(Model model) {
         //List<Member> members = memberService.findMembers();
@@ -67,11 +69,11 @@ public class MemberController {
     @PostMapping("/members/new")
     public String createMember(@Valid @ModelAttribute("form") MemberJoinForm form, BindingResult result, Model model) {
 
-        if(memberService.checkUserIdDuplication(form)){
+        if(memberService.checkUserIdDuplication(form.getUserId())){
             log.info("Duplicated ID ={}",form.getUserId());
             result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
         }
-        if(memberService.checkUserEmailDuplication(form)){
+        if(memberService.checkUserEmailDuplication(form.getUserEmail())){
             log.info("Duplicated Email ={}",form.getUserEmail());
             result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
         }
@@ -93,7 +95,9 @@ public class MemberController {
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
-        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail());
+        List<Post> postsFromMember = postService.getPostsFromMember(id);
+        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(),postsFromMember);
+        log.info("memberForm "+ memberForm.getPosts());
         model.addAttribute("form",memberForm);
         model.addAttribute("loginMember",loginMember);
         return "/members/memberInfo";
@@ -125,20 +129,24 @@ public class MemberController {
      * 그래서 또 다음 수정할때 오류발생
      * 해결 -> 세션에 유지중인 loginMember 을 수정된 새로운 Member 로 갱신
      * Or 그냥 수정하면 로그아웃시키기 ?
+     *
+     *
+     * 아이디 이메일 중복검사, 비번확인 따로해서 BindingResult에 넣었는데 @Validation 커스텀으로 새로 만들기로 가능
+     *
      */
     @PostMapping("members/{id}/update")
-    public String update(@PathVariable Long id,Model model,@ModelAttribute("form") MemberUpdateForm form,BindingResult result,
+    public String update(@PathVariable Long id,Model model,@Valid @ModelAttribute("form") MemberUpdateForm form,BindingResult result,
                              @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
                          HttpServletRequest request){
 
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
-        if(!loginMember.getUserId().equals(form.getUserId()) && memberService.checkUserIdDuplication(form)){
+        if(!loginMember.getUserId().equals(form.getUserId()) && memberService.checkUserIdDuplication(form.getUserId())){
             log.info("Duplicated ID ={}",form.getUserId());
             result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
         }
-        if(!loginMember.getUserEmail().equals(form.getUserEmail()) &&memberService.checkUserEmailDuplication(form)){
+        if(!loginMember.getUserEmail().equals(form.getUserEmail()) &&memberService.checkUserEmailDuplication(form.getUserEmail())){
             log.info("Duplicated Email ={}",form.getUserEmail());
             result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
         }
@@ -146,6 +154,7 @@ public class MemberController {
             log.info("OldPassword Error ={}",form.getOldPassword());
             result.addError(new FieldError("form","oldPassword",form.getOldPassword(),false,null,null,"기존 비밀번호를 잘못입력하였습니다."));
         }
+
         if (result.hasErrors()) {
             log.info("errors={}", result);
             return "members/memberUpdateForm";

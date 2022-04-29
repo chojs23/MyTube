@@ -2,10 +2,7 @@ package com.mytube.domain;
 
 
 import com.mytube.domain.BaseEntities.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,6 +10,7 @@ import javax.persistence.*;
 @Getter
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(of = {"title","member","createdDate","lastModifiedDate"})
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -27,6 +25,12 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
+
+
+    public void updatePost(String title,String content){
+        this.title=title;
+        this.content=content;
+    }
 
     @Builder
     public Post(String title, String content,Member member) {

@@ -1,6 +1,9 @@
 package com.mytube.service;
 
 
+import com.mytube.Controller.form.MemberUpdateForm;
+import com.mytube.Controller.form.PostCreateForm;
+import com.mytube.domain.Member;
 import com.mytube.domain.Post;
 import com.mytube.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +30,44 @@ public class PostService {
         return post.getId();
     }
 
+    @Transactional
+    public boolean updatePost(Long id, PostCreateForm form){
+        Optional<Post> findPost = postRepository.findById(id);
+
+        if(!findPost.isPresent()){
+            log.info("isPresent false");
+            return false;
+        }
+        Post post = findPost.get();
+        log.info("post = " + post);
+
+        post.updatePost(form.getTitle(), form.getContent());
+        Post save = postRepository.save(post);
+
+        log.info("save = " + save);
+        return true;
+    }
+
+    @Transactional
+    public Post deletePost(Long id){
+        Optional<Post> findPost = postRepository.findById(id);
+        if(!findPost.isPresent()){
+            log.info("isPresent false");
+            return null;
+        }
+        Post post = findPost.get();
+
+        postRepository.delete(post);
+
+        return post;
+    }
+
     public Optional<Post> getPost(Long id){
         return postRepository.findById(id);
+    }
+
+    public List<Post> getPostsFromMember(Long id){
+        return postRepository.findPostsByMember_Id(id);
     }
 
     public List<Post> getAllPosts(){

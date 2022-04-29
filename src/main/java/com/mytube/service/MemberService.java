@@ -73,11 +73,11 @@ public class MemberService {
         return true;
     }
 
-    public boolean checkUserIdDuplication(MemberForm form) {
-        return memberRepository.existsByUserId(form.getUserId());
+    public boolean checkUserIdDuplication(String userId) {
+        return memberRepository.existsByUserId(userId);
     }
-    public boolean checkUserEmailDuplication(MemberForm form) {
-        return memberRepository.existsByUserEmail(form.getUserEmail());
+    public boolean checkUserEmailDuplication(String email) {
+        return memberRepository.existsByUserEmail(email);
     }
 
 
