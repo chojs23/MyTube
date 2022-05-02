@@ -5,6 +5,7 @@ import com.mytube.Controller.form.MemberForm;
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.domain.Member;
+import com.mytube.repository.MemberImageRepository;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final MemberImageRepository memberImageRepository;
 
 
     @Transactional
@@ -67,7 +69,8 @@ public class MemberService {
             return false;
         }
 
-        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail());
+        memberImageRepository.save(form.getMemberImage());
+        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),form.getMemberImage());
         Member save = memberRepository.save(member);
         log.info("save = " + save);
         return true;

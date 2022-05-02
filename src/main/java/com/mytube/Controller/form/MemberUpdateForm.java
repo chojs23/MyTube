@@ -2,7 +2,9 @@ package com.mytube.Controller.form;
 
 
 import com.mytube.domain.Member;
+import com.mytube.domain.MemberImage;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -17,11 +19,15 @@ public class MemberUpdateForm extends MemberForm{
     @NotEmpty(message = "Email 필수")
     private String userEmail;
 
+    private MemberImage memberImage;
+    private MultipartFile multipartFile;
+
     public Member toEntity(){
         return Member.builder()
                 .userId(userId)
                 .password(newPassword)
                 .userEmail(userEmail)
+                .memberImage(memberImage)
                 .build();
     }
 }

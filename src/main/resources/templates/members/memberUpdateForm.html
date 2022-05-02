@@ -20,14 +20,15 @@
     <div class="py-5 text-center">
         <h2>회원 정보 수정</h2>
     </div>
-    <form th:action th:object="${form}" method="post">
+    <form th:action th:object="${form}" method="post" enctype="multipart/form-data">
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}"
                th:text="${err}">전체 오류 메시지</p>
         </div>
+
         <div>
             <label for="UserId">UserId</label>
-            <input type="text" id="UserId" th:field="*{userId}" class="formcontrol"
+            <input type="text" id="UserId" th:field="*{userId}" class="form-control"
                    th:errorclass="field-error">
             <div class="field-error" th:errors="*{userId}" />
         </div>
@@ -51,6 +52,12 @@
                    class="form-control"
                    th:errorclass="field-error">
             <div class="field-error" th:errors="*{userEmail}" />
+        </div>
+        <div>
+            <label for="multipartFile">MemberImage</label>
+            <input type="file" id="multipartFile" th:field="*{multipartFile}" class="form-control"
+                   th:errorclass="field-error">
+            <div class="field-error" th:errors="*{multipartFile}" />
         </div>
         <hr class="my-4">
         <div class="row">

@@ -6,13 +6,19 @@ import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.domain.Member;
+import com.mytube.domain.MemberImage;
 import com.mytube.domain.Post;
 import com.mytube.dto.memberDto;
 import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
+import com.mytube.upload.UploadImage;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,11 +27,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.awt.print.Pageable;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +46,16 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PostService postService;
+    private final UploadImage uploadImage;
     //@GetMapping("/members")
     public String showMembers(Model model) {
         //List<Member> members = memberService.findMembers();
         //model.addAttribute("members", members);
         return "members/memberList";
     }
+
+    @Value("${custom.path.memberImage}")
+    private String memberImageDir;
 
     @GetMapping("/members")
     public String showMembers2(@RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy,Model model) {
@@ -91,16 +105,28 @@ public class MemberController {
 
     @GetMapping("members/{id}/info")
     public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
-                       @PathVariable Long id) {
+                       @PathVariable Long id) throws MalformedURLException {
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
         List<Post> postsFromMember = postService.getPostsFromMember(id);
-        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(),postsFromMember);
-        log.info("memberForm "+ memberForm.getPosts());
+        MemberImage memberImage = loginMember.getMemberImage();
+        String filename = null;
+        if (memberImage != null) {
+            filename = memberImage.getSavedName();
+        }
+        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(), postsFromMember, filename);
+
+        log.info("memberForm "+ memberForm);
         model.addAttribute("form",memberForm);
         model.addAttribute("loginMember",loginMember);
         return "/members/memberInfo";
+    }
+    @ResponseBody
+    @GetMapping("/images/{filename}")
+    public Resource downloadImage(@PathVariable String filename) throws
+            MalformedURLException {
+        return new UrlResource("file:" + uploadImage.getFullPath(filename));
     }
 
     @GetMapping("members/{id}/update")
@@ -135,9 +161,9 @@ public class MemberController {
      *
      */
     @PostMapping("members/{id}/update")
-    public String update(@PathVariable Long id,Model model,@Valid @ModelAttribute("form") MemberUpdateForm form,BindingResult result,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
-                         HttpServletRequest request){
+    public String update(@PathVariable Long id, Model model, @Valid @ModelAttribute("form") MemberUpdateForm form, BindingResult result,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
 
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
@@ -159,6 +185,11 @@ public class MemberController {
             log.info("errors={}", result);
             return "members/memberUpdateForm";
         }
+
+        MemberImage memberImage = uploadImage.uploadMemberImage(form.getMultipartFile(), id);
+
+        form.setMemberImage(memberImage);
+
         boolean b = memberService.updateMember(id, form);
 
         if (!b){
@@ -171,7 +202,9 @@ public class MemberController {
 
         session.setAttribute(SessionConst.LOGIN_MEMBER, memberService.findMember(loginMember.getId()).get());
 
-        return "redirect:/";
+        redirectAttributes.addAttribute("id", id);
+
+        return "redirect:/members/{id}/info";
     }
 
     @GetMapping("members/login")

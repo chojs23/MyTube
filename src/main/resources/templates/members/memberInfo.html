@@ -14,6 +14,11 @@
     </div>
 
     <div th:object="${form}">
+        <div class="memberImage" style ="text-align:center;">
+            <img th:if="${form.memberImageName != null}" th:src="|/images/${form.memberImageName}|" width="300" height="300" />
+            <span th:unless="${form.memberImageName != null}">대표 사진 없음</span>
+
+        </div>
         <div>
             <label for="userId">UserId</label>
             <input type="text" id="userId" th:field="*{userId}" class="form-control" disabled>

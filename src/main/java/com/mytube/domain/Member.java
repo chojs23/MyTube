@@ -25,21 +25,25 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,unique = true,length =45)
     private String userEmail;
 
+    @OneToOne
+    private MemberImage memberImage;
 
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts=new ArrayList<>();
 
-    public void updateMember(String userId,String password,String userEmail){
+    public void updateMember(String userId,String password,String userEmail,MemberImage memberImage){
         this.userId=userId;
         this.password=password;
         this.userEmail=userEmail;
+        this.memberImage=memberImage;
     }
 
     @Builder
-    public Member(String userId, String userEmail,String password) {
+    public Member(String userId, String userEmail,String password,MemberImage memberImage) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.password=password;
+        this.memberImage=memberImage;
     }
 }

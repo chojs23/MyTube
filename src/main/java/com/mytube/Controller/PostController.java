@@ -144,9 +144,9 @@ public class PostController {
 
     @GetMapping("/posts/{id}/delete")
     public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
-        Post post = postService.deletePost(id);
+        Post deletePost = postService.deletePost(id);
 
-        log.info("del post = " + post);
+        log.info("del post = " + deletePost);
         return "redirect:/posts";
     }
 }
