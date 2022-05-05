@@ -19,6 +19,10 @@ public class MemberUpdateForm extends MemberForm{
     @NotEmpty(message = "Email 필수")
     private String userEmail;
 
+    private String oldUserId;
+    private String oldUserEmail;
+    private String loginMemberPassword;
+
     private MemberImage memberImage;
     private MultipartFile multipartFile;
 

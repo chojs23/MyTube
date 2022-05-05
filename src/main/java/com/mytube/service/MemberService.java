@@ -67,8 +67,12 @@ public class MemberService {
         log.info("member = " + member);
 
         MemberImage formMemberImage = form.getMemberImage();
+        if (formMemberImage==null){
+            formMemberImage = new MemberImage(member, null, null, null);
+        }
         MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(id).orElse(formMemberImage);
         memberImageByMember_id.updateMemberImage(formMemberImage.getOrigFileName(),formMemberImage.getSavedName(),formMemberImage.getFilePath());
+        log.info("memberImageByMember = " + memberImageByMember_id);
         CommonUtils.saveIfNullId(memberImageByMember_id.getId(),memberImageRepository,memberImageByMember_id);
 
         member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),memberImageByMember_id);
@@ -77,11 +81,17 @@ public class MemberService {
         return true;
     }
 
-    public boolean checkUserIdDuplication(String userId) {
-        return memberRepository.existsByUserId(userId);
+    public void checkUserIdDuplication(String userId) {
+        boolean userIdDuplicate = memberRepository.existsByUserId(userId);
+        if(userIdDuplicate){
+            throw new IllegalStateException("이미 존재하는 아이디 입니다.");
+        }
     }
-    public boolean checkUserEmailDuplication(String email) {
-        return memberRepository.existsByUserEmail(email);
+    public void checkUserEmailDuplication(String email) {
+        boolean userEmailDuplicate = memberRepository.existsByUserEmail(email);
+        if(userEmailDuplicate){
+            throw new IllegalStateException("이미 존재하는 이메일 입니다.");
+        }
     }
 
 

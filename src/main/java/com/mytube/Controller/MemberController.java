@@ -13,6 +13,8 @@ import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
 import com.mytube.upload.UploadImage;
 import com.mytube.web.SessionConst;
+import com.mytube.web.validator.MemberUpdateFormValidator;
+import com.mytube.web.validator.SignUpFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +46,8 @@ import java.util.Optional;
 @Controller
 @RequiredArgsConstructor
 public class MemberController {
+    private final SignUpFormValidator signUpFormValidator;
+    private final MemberUpdateFormValidator memberUpdateFormValidator;
 
     private final MemberService memberService;
     private final PostService postService;
@@ -81,19 +86,18 @@ public class MemberController {
 
 
     @PostMapping("/members/new")
-    public String createMember(@Valid @ModelAttribute("form") MemberJoinForm form, BindingResult result, Model model) {
-
-        if(memberService.checkUserIdDuplication(form.getUserId())){
-            log.info("Duplicated ID ={}",form.getUserId());
-            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
-        }
-        if(memberService.checkUserEmailDuplication(form.getUserEmail())){
-            log.info("Duplicated Email ={}",form.getUserEmail());
-            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
-        }
-
-        if (result.hasErrors()) {
-            log.info("errors={}", result);
+    public String createMember(@Valid @ModelAttribute("form") MemberJoinForm form, Errors errors, Model model) {
+//        if(memberService.checkUserIdDuplication(form.getUserId())){
+//            log.info("Duplicated ID ={}",form.getUserId());
+//            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
+//        }
+//        if(memberService.checkUserEmailDuplication(form.getUserEmail())){
+//            log.info("Duplicated Email ={}",form.getUserEmail());
+//            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
+//        }
+        signUpFormValidator.validate(form, errors);
+        if (errors.hasErrors()) {
+            log.info("errors={}", errors);
             return "members/createMemberForm";
         }
 
@@ -161,28 +165,33 @@ public class MemberController {
      *
      */
     @PostMapping("members/{id}/update")
-    public String update(@PathVariable Long id, Model model, @Valid @ModelAttribute("form") MemberUpdateForm form, BindingResult result,
+    public String update(@PathVariable Long id, Model model, @Valid @ModelAttribute("form") MemberUpdateForm form, Errors errors,
                          @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
                          HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
 
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
-        if(!loginMember.getUserId().equals(form.getUserId()) && memberService.checkUserIdDuplication(form.getUserId())){
-            log.info("Duplicated ID ={}",form.getUserId());
-            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
-        }
-        if(!loginMember.getUserEmail().equals(form.getUserEmail()) &&memberService.checkUserEmailDuplication(form.getUserEmail())){
-            log.info("Duplicated Email ={}",form.getUserEmail());
-            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
-        }
-        if(!loginMember.getPassword().equals(form.getOldPassword())){
-            log.info("OldPassword Error ={}",form.getOldPassword());
-            result.addError(new FieldError("form","oldPassword",form.getOldPassword(),false,null,null,"기존 비밀번호를 잘못입력하였습니다."));
-        }
 
-        if (result.hasErrors()) {
-            log.info("errors={}", result);
+//        if(!loginMember.getUserId().equals(form.getUserId()) && memberService.checkUserIdDuplication(form.getUserId())){
+//            log.info("Duplicated ID ={}",form.getUserId());
+//            result.addError(new FieldError("form","userId",form.getUserId(),false,null,null,"중복된 ID 입니다."));
+//        }
+//        if(!loginMember.getUserEmail().equals(form.getUserEmail()) &&memberService.checkUserEmailDuplication(form.getUserEmail())){
+//            log.info("Duplicated Email ={}",form.getUserEmail());
+//            result.addError(new FieldError("form","userEmail",form.getUserEmail(),false,null,null,"중복된 Email 입니다."));
+//        }
+//        if(!loginMember.getPassword().equals(form.getOldPassword())){
+//            log.info("OldPassword Error ={}",form.getOldPassword());
+//            errors.addError(new FieldError("form","oldPassword",form.getOldPassword(),false,null,null,"기존 비밀번호를 잘못입력하였습니다."));
+//        }
+        form.setOldUserId(loginMember.getUserId());
+        form.setOldUserEmail(loginMember.getUserEmail());
+        form.setLoginMemberPassword(loginMember.getPassword());
+
+        memberUpdateFormValidator.validate(form, errors);
+        if (errors.hasErrors()) {
+            log.info("errors={}", errors);
             return "members/memberUpdateForm";
         }
 

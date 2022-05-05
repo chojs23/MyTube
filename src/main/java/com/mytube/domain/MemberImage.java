@@ -22,13 +22,13 @@ public class MemberImage {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String origFileName;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String savedName;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String filePath;
 
     @Builder
