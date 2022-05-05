@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Getter
+@ToString(of = {"id","member","origFileName"})
 public class MemberImage {
 
     @Id
@@ -33,6 +34,11 @@ public class MemberImage {
     @Builder
     public MemberImage(Member member, String origFileName,String savedName,String filePath) {
         this.member = member;
+        this.origFileName = origFileName;
+        this.savedName = savedName;
+        this.filePath = filePath;
+    }
+    public void updateMemberImage(String origFileName,String savedName,String filePath){
         this.origFileName = origFileName;
         this.savedName = savedName;
         this.filePath = filePath;

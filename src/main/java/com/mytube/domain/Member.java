@@ -25,7 +25,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,unique = true,length =45)
     private String userEmail;
 
-    @OneToOne
+    @OneToOne(mappedBy = "member",cascade = CascadeType.ALL)
     private MemberImage memberImage;
 
 

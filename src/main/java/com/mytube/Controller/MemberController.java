@@ -235,7 +235,7 @@ public class MemberController {
         return "redirect:/";
     }
     @PostMapping("/members/logout")
-    public String logoutV3(HttpServletRequest request) {
+    public String logout(HttpServletRequest request) {
         //세션을 삭제한다.
         HttpSession session = request.getSession(false);
         if (session != null) {

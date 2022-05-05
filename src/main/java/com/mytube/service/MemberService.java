@@ -4,7 +4,9 @@ package com.mytube.service;
 import com.mytube.Controller.form.MemberForm;
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberUpdateForm;
+import com.mytube.Utils.CommonUtils;
 import com.mytube.domain.Member;
+import com.mytube.domain.MemberImage;
 import com.mytube.repository.MemberImageRepository;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,13 +66,12 @@ public class MemberService {
         Member member = findMember.get();
         log.info("member = " + member);
 
-        if (!member.getPassword().equals(form.getOldPassword())){
-            log.info("oldPassword err");
-            return false;
-        }
+        MemberImage formMemberImage = form.getMemberImage();
+        MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(id).orElse(formMemberImage);
+        memberImageByMember_id.updateMemberImage(formMemberImage.getOrigFileName(),formMemberImage.getSavedName(),formMemberImage.getFilePath());
+        CommonUtils.saveIfNullId(memberImageByMember_id.getId(),memberImageRepository,memberImageByMember_id);
 
-        memberImageRepository.save(form.getMemberImage());
-        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),form.getMemberImage());
+        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),memberImageByMember_id);
         Member save = memberRepository.save(member);
         log.info("save = " + save);
         return true;
