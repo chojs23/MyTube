@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -125,25 +126,38 @@ public class PostController {
 
     @PostMapping("/posts/{id}/update")
     public String UpdatePost(@PathVariable Long id,@Valid @ModelAttribute("form") PostCreateForm form,BindingResult result,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                             RedirectAttributes redirectAttributes) {
+        Post post = postService.getPost(id).get();
+        Member member = post.getMember();
+        if (!loginMember.getId().equals(member.getId())){
+            log.info("잘못된 사용자 게시글 수정");
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/posts/{id}/detail";
+        }
 
         if (result.hasErrors()) {
             log.info("errors={}", result);
             return "posts/updatePostForm";
         }
 
-        Optional<Post> post = postService.getPost(id);
-        if (post.isEmpty()){
-            log.info("PostDetail => Empty post");
-            return "redirect:/posts";
-        }
+
         postService.updatePost(id, form);
 
         return "redirect:/posts/{id}/detail";
     }
 
     @GetMapping("/posts/{id}/delete")
-    public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+    public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                             RedirectAttributes redirectAttributes){
+        Post post = postService.getPost(id).get();
+        Member member = post.getMember();
+        if (!loginMember.getId().equals(member.getId())){
+            log.info("잘못된 사용자 게시글 삭제");
+            redirectAttributes.addAttribute("id", id);
+            return "redirect:/posts/{id}/detail";
+        }
+
         Post deletePost = postService.deletePost(id);
 
         log.info("del post = " + deletePost);

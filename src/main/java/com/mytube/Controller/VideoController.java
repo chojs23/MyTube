@@ -106,6 +106,7 @@ public class VideoController {
     @GetMapping("/videos/{filename}")
     public Resource showVideo(@PathVariable String filename) throws
             MalformedURLException {
+        log.info("dasdsadsadsadsadasdasdasdasdas");
         return new UrlResource("file:" + uploadVideo.getFullPath(filename));
     }
 }
