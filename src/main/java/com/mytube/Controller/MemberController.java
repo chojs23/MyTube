@@ -133,7 +133,7 @@ public class MemberController {
 
     @ResponseBody
     @GetMapping("/images/{filename}")
-    public Resource downloadImage(@PathVariable String filename) throws
+    public Resource showMemberImage(@PathVariable String filename) throws
             MalformedURLException {
         return new UrlResource("file:" + uploadImage.getFullPath(filename));
     }
