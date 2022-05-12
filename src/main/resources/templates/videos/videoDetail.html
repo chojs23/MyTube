@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+    <div class="py-5 text-center">
+        <h2>Video Detail</h2>
+    </div>
+
+    <div th:object="${videoDto}">
+        <div>
+            <label for="title">제목</label>
+            <input type="text" id="title" th:field="*{title}" class="form-control" disabled>
+
+        </div>
+
+        <div>
+            <video width="320" height="240" controls>
+                <source th:src="|/videos/*{attachFile.getStoreFileName()}|" type="video/mp4">
+            </video>
+        </div>
+
+        <div th:if="${loginMember} != null and ${loginMember.id}==*{member.id} " th:class="form-control">
+            <a th:href="@{/videos/{id}/update (id=*{id})}" th:text="수정하기"></a>
+            <a th:href="@{/videos/{id}/delete (id=*{id})}" th:text="삭제하기"></a>
+        </div>
+    </div>
+</div> <!-- /container -->
+</body>
+</html>

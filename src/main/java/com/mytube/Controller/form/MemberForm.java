@@ -2,6 +2,7 @@ package com.mytube.Controller.form;
 
 import com.mytube.domain.MemberImage;
 import com.mytube.domain.Post;
+import com.mytube.dto.postDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,11 +19,11 @@ public class MemberForm {
 
     private String userEmail;
 
-    private List<Post> posts;
+    private List<postDto> posts;
 
     private String memberImageName;
 
-    public MemberForm(String userId,String userEmail,List<Post> posts){
+    public MemberForm(String userId,String userEmail,List<postDto> posts){
         this.userId=userId;
         this.userEmail = userEmail;
         this.posts = posts;

@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             countQuery = "select count(m.userId) from Member m")
     Page<Member> findMemberAllCountBy(Pageable pageable);
 
-
+    //TODO 멤버조회할때 memberImage fetch join으로
 
 
 }

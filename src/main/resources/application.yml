@@ -9,8 +9,9 @@ spring:
     hibernate:
       ddl-auto: create
     properties:
-      # show_sql: true
-      format_sql: true
+      show_sql: true
+      hibernate:
+        format_sql: true
   session:
     timeout: 30m
   servlet:

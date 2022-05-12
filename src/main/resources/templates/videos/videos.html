@@ -31,7 +31,7 @@
             <th:block th:each="video:${videos}">
                 <tr>
                     <td th:text="${video.id}">
-                    <td ><a th:href="@{/video/{id}/detail (id=${video.getId()})}" th:text="${video.title}"></a></td>
+                    <td ><a th:href="@{/videos/{id}/detail (id=${video.getId()})}" th:text="${video.title}"></a></td>
                     <td th:text="${video.member.userId}"></td>
                     <td th:text="${video.createdDate}"></td>
                     <td th:text="${video.lastModifiedDate}"></td>

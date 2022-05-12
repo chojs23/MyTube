@@ -24,6 +24,15 @@ public class videoDto {
 
     private String lastModifiedDate;
 
+    public videoDto(Video video) {
+        this.id = video.getId();
+        this.title = video.getTitle();
+        this.attachFile = video.getAttachFile();
+        this.member = video.getMember();
+        this.createdDate = video.getCreatedDate();
+        this.lastModifiedDate = video.getLastModifiedDate();
+    }
+
     public Video toEntity(){
         return Video.builder()
                 .title(title)

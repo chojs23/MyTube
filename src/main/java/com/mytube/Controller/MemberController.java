@@ -9,6 +9,7 @@ import com.mytube.domain.Member;
 import com.mytube.domain.MemberImage;
 import com.mytube.domain.Post;
 import com.mytube.dto.memberDto;
+import com.mytube.dto.postDto;
 import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
 import com.mytube.upload.UploadImage;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -59,8 +61,7 @@ public class MemberController {
         return "members/memberList";
     }
 
-    @Value("${custom.path.memberImage}")
-    private String memberImageDir;
+
 
     @GetMapping("/members")
     public String showMembers2(@RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy,Model model) {
@@ -114,18 +115,22 @@ public class MemberController {
             return "redirect:/";
         }
         List<Post> postsFromMember = postService.getPostsFromMember(id);
+
+        List<postDto> MemberPostsDto = postsFromMember.stream().map(postDto::new).collect(Collectors.toList());
+
         MemberImage memberImage = loginMember.getMemberImage();
         String filename = null;
         if (memberImage != null) {
             filename = memberImage.getSavedName();
         }
-        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(), postsFromMember, filename);
+        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(), MemberPostsDto, filename);
 
         log.info("memberForm "+ memberForm);
         model.addAttribute("form",memberForm);
         model.addAttribute("loginMember",loginMember);
         return "/members/memberInfo";
     }
+
     @ResponseBody
     @GetMapping("/images/{filename}")
     public Resource downloadImage(@PathVariable String filename) throws

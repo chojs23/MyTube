@@ -3,14 +3,18 @@ package com.mytube.Controller;
 
 import com.mytube.Controller.form.VideoCreateForm;
 import com.mytube.domain.Member;
+import com.mytube.domain.Post;
 import com.mytube.domain.Video;
 import com.mytube.domain.VideoFile;
+import com.mytube.dto.postDto;
 import com.mytube.dto.videoDto;
 import com.mytube.service.VideoService;
 import com.mytube.upload.UploadVideo;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Optional;
 
 @Controller
@@ -81,5 +86,26 @@ public class VideoController {
 
         return "redirect:/videos";
 
+    }
+
+    @GetMapping("/videos/{id}/detail")
+    public String videoDetail(@PathVariable Long id, Model model,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+        Video video = videoService.getVideo(id);
+
+
+        videoDto videoDto = new videoDto(video);
+        model.addAttribute("videoDto", videoDto);
+        model.addAttribute("loginMember", loginMember);
+
+        return "/videos/videoDetail";
+
+    }
+
+    @ResponseBody
+    @GetMapping("/videos/{filename}")
+    public Resource downloadImage(@PathVariable String filename) throws
+            MalformedURLException {
+        return new UrlResource("file:" + uploadVideo.getFullPath(filename));
     }
 }
