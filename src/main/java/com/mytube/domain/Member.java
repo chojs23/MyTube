@@ -6,7 +6,9 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,7 +27,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,unique = true,length =45)
     private String userEmail;
 
-    @OneToOne(mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "member")
     private MemberImage memberImage;
 
 
@@ -34,6 +36,12 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Video> videos=new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromMember",cascade = CascadeType.ALL)
+    private Set<Follow> followings = new HashSet<>();
+
+    @OneToMany(mappedBy = "toMember",cascade = CascadeType.ALL)
+    private Set<Follow> followers = new HashSet<>();
 
     public void updateMember(String userId,String password,String userEmail,MemberImage memberImage){
         this.userId=userId;
@@ -48,5 +56,6 @@ public class Member extends BaseTimeEntity {
         this.userEmail = userEmail;
         this.password=password;
         this.memberImage=memberImage;
+
     }
 }

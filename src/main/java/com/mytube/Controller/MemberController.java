@@ -221,6 +221,15 @@ public class MemberController {
         return "redirect:/members/{id}/info";
     }
 
+    @PostMapping("members/{follower}/follow/{target}")
+    public String follow(@PathVariable Long follower, @PathVariable Long target, RedirectAttributes redirectAttributes) {
+
+
+
+        redirectAttributes.addAttribute("follower", follower);
+        return "redirect:/members/{follower}/info";
+    }
+
     @GetMapping("members/login")
     public String loginForm(@ModelAttribute("form") MemberLoginForm form) {
         return "members/memberLoginForm";
@@ -239,12 +248,7 @@ public class MemberController {
             return "members/memberLoginForm";
         }
 
-        //로그인 성공 처리 TODO
-        //세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
-
         HttpSession session = request.getSession();
-        //세션에 로그인 회원 정보 보관
-
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
     }

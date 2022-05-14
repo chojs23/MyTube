@@ -23,7 +23,7 @@ public class Post extends BaseEntity {
     @Column(nullable = false,length = 1000)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name="member_id")
     private Member member;
 
