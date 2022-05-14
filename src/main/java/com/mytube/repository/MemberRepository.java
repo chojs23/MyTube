@@ -20,8 +20,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findById(Long id);
 
+
+
     @Query("select m from Member m where m.userId=:userId")
-    Member findMemberByUserId(@Param("userId") String userId);
+    Optional<Member> findMemberByUserId(@Param("userId") String userId);
 
     @Query(value = "select m from Member m",
             countQuery = "select count(m.userId) from Member m")

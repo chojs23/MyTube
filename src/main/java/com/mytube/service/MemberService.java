@@ -7,6 +7,7 @@ import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.Utils.CommonUtils;
 import com.mytube.domain.Member;
 import com.mytube.domain.MemberImage;
+import com.mytube.exception.MemberNotFoundException;
 import com.mytube.repository.MemberImageRepository;
 import com.mytube.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +36,9 @@ public class MemberService {
     }
 
     public Member login(String loginId,String password){
-        Member findMember = memberRepository.findMemberByUserId(loginId);
-        if (findMember==null){
-            return null;
-        }
+        Member findMember = memberRepository.findMemberByUserId(loginId)
+                .orElseThrow(()->new MemberNotFoundException("ex"));
+
         return findMember.getPassword().equals(password)?findMember:null;
     }
     /**
@@ -79,6 +79,30 @@ public class MemberService {
         Member save = memberRepository.save(member);
         log.info("save = " + save);
         return true;
+    }
+
+
+    @Transactional
+    public Member addFollow(Long targetId,Long followerId){
+
+        Member target = memberRepository.findById(targetId)
+                .orElseThrow(()->new MemberNotFoundException("ex"));
+        Member follower = memberRepository.findById(followerId)
+                .orElseThrow(()->new MemberNotFoundException("ex"));;
+
+        follower.getMemberFollowing().getFollowingList().add(target);
+        follower.getFollowingList().add(target);
+        log.info("follower's following add");
+        target.getMemberFollower().getFollowerList().add(follower);
+        target.getFollowerList().add(follower);
+        log.info("target's follower add");
+
+
+        log.info("following List = " + follower.getFollowingList());
+        log.info("follower List = " + target.getFollowerList());
+
+
+        return target;
     }
 
     public void checkUserIdDuplication(String userId) {
