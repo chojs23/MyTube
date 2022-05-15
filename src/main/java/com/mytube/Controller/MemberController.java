@@ -10,6 +10,7 @@ import com.mytube.domain.MemberImage;
 import com.mytube.domain.Post;
 import com.mytube.dto.memberDto;
 import com.mytube.dto.postDto;
+import com.mytube.exception.MemberNotFoundException;
 import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
 import com.mytube.upload.UploadImage;
@@ -107,6 +108,8 @@ public class MemberController {
         memberService.join(member);
         return "redirect:/";
     }
+
+
 
     @GetMapping("members/{id}/info")
     public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
@@ -222,6 +225,25 @@ public class MemberController {
         return "redirect:/members/{id}/info";
     }
 
+    @PostMapping("members/{id}/withdrawal")
+    public String withdrawal(@PathVariable Long id, Model model,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         HttpServletRequest request) throws IOException {
+
+        if (!id.equals(loginMember.getId())){
+            return "redirect:/";
+        }
+        Member member = memberService.findMember(id).get();
+        memberService.withdrawal(member);
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "redirect:/";
+    }
+
     @PostMapping("members/{follower}/follow/{target}")
     public String follow(@PathVariable Long follower, @PathVariable Long target, RedirectAttributes redirectAttributes) {
 
@@ -241,7 +263,13 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             return "members/memberLoginForm";
         }
-        Member loginMember = memberService.login(form.getUserId(), form.getPassword());
+        Member loginMember = null;
+        try {
+            loginMember = memberService.login(form.getUserId(), form.getPassword());
+        } catch (MemberNotFoundException e) {
+            bindingResult.reject("MemberNotFound", "아이디가 존재하지 않습니다.");
+            return "members/memberLoginForm";
+        }
         log.info("login? {}", loginMember);
         if (loginMember == null) {
             log.info("null login");

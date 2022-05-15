@@ -37,6 +37,12 @@ public class MemberService {
         return member.getId();
     }
 
+    @Transactional
+    public void withdrawal(Member member){
+        log.info("withdrawal member = "+member);
+        memberRepository.delete(member);
+    }
+
     public Member login(String loginId,String password){
         Member findMember = memberRepository.findMemberByUserId(loginId)
                 .orElseThrow(()->new MemberNotFoundException("ex"));

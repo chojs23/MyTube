@@ -31,10 +31,10 @@ public class Member extends BaseTimeEntity {
     private MemberImage memberImage;
 
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
     private List<Post> posts=new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
     private List<Video> videos=new ArrayList<>();
 
     @OneToMany(mappedBy = "fromMember",cascade = CascadeType.ALL)
