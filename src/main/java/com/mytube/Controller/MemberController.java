@@ -111,19 +111,20 @@ public class MemberController {
     @GetMapping("members/{id}/info")
     public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
                        @PathVariable Long id) throws MalformedURLException {
-        if (!id.equals(loginMember.getId())){
-            return "redirect:/";
-        }
+//        if (!id.equals(loginMember.getId())){
+//            return "redirect:/";
+//        }
         List<Post> postsFromMember = postService.getPostsFromMember(id);
 
         List<postDto> MemberPostsDto = postsFromMember.stream().map(postDto::new).collect(Collectors.toList());
 
-        MemberImage memberImage = loginMember.getMemberImage();
+        Member member = memberService.findMember(id).get();
+        MemberImage memberImage = member.getMemberImage();
         String filename = null;
         if (memberImage != null) {
             filename = memberImage.getSavedName();
         }
-        MemberForm memberForm = new MemberForm(loginMember.getUserId(), loginMember.getUserEmail(), MemberPostsDto, filename);
+        MemberForm memberForm = new MemberForm(member.getUserId(), member.getUserEmail(), MemberPostsDto, filename);
 
         log.info("memberForm "+ memberForm);
         model.addAttribute("form",memberForm);

@@ -10,7 +10,8 @@
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader" />
     <div class="py-5 text-center">
-        <h2>내 정보</h2>
+        <h2 th:if="${loginMember.id==id}">내 정보</h2>
+        <h2 th:unless="${loginMember.id==id}">회원 정보</h2>
     </div>
 
     <div th:object="${form}">
@@ -33,7 +34,7 @@
         </div>
         <hr class="my-4">
         <div class="row">
-            <div class="col">
+            <div class="col" th:if="${loginMember.id==id}">
                 <button class="w-100 btn btn-secondary btn-lg" type="button"
                         th:onclick="|location.href='@{/members/{id}/update (id=${loginMember.id})}'|">
                     내 정보 수정
