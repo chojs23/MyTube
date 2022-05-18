@@ -1,5 +1,6 @@
 package com.mytube.domain;
 
+import com.mytube.domain.BaseEntities.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -11,7 +12,7 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @ToString(of = {"id","member","origFileName"})
-public class MemberImage {
+public class MemberImage{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

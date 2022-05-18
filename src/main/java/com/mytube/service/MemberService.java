@@ -103,6 +103,18 @@ public class MemberService {
         return save;
     }
 
+    @Transactional
+    public Follow unfollow(Long fromId, Long toId) {
+        Member fromMember = memberRepository.findById(fromId)
+                .orElseThrow(()->new MemberNotFoundException("ex"));
+        Member toMember = memberRepository.findById(toId)
+                .orElseThrow(()->new MemberNotFoundException("ex"));
+        Follow del_follow = followRepository.findFollowByFromMemberAndToMember(fromMember, toMember);
+        followRepository.delete(del_follow);
+
+        return del_follow;
+    }
+
     public Long getFollowId(Long fromId,Long toId){
         Member fromMember = memberRepository.findById(fromId)
                 .orElseThrow(()->new MemberNotFoundException("ex"));
@@ -120,18 +132,6 @@ public class MemberService {
     }
 
 
-    public void checkUserIdDuplication(String userId) {
-        boolean userIdDuplicate = memberRepository.existsByUserId(userId);
-        if(userIdDuplicate){
-            throw new IllegalStateException("이미 존재하는 아이디 입니다.");
-        }
-    }
-    public void checkUserEmailDuplication(String email) {
-        boolean userEmailDuplicate = memberRepository.existsByUserEmail(email);
-        if(userEmailDuplicate){
-            throw new IllegalStateException("이미 존재하는 이메일 입니다.");
-        }
-    }
 
 
 

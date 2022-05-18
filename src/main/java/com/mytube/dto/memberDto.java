@@ -1,5 +1,6 @@
 package com.mytube.dto;
 
+import com.mytube.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,10 @@ public class memberDto {
 
     private String createdDate;
 
-
+    public memberDto(Member member){
+        this.id = member.getId();
+        this.userId = member.getUserId();
+        this.userEmail = member.getUserEmail();
+        this.createdDate = member.getCreatedDate();
+    }
 }

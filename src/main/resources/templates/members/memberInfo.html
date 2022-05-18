@@ -34,6 +34,19 @@
         </div>
         <hr class="my-4">
         <div class="row">
+            <div class="col" th:if="${loginMember!=null and loginMember.id!=id and followed==false}">
+                <form th:action="@{/api/members/{loginId}/follow/{id} (loginId=${loginMember.id},id=${id})}" method="post">
+                    <button class="w-100 btn btn-secondary btn-lg" name="follow" value="follow">Follow</button>
+                </form>
+            </div>
+            <div class="col" th:if="${loginMember!=null and loginMember.id!=id and followed==true}">
+                <form th:action="@{/api/members/{loginId}/unfollow/{id} (loginId=${loginMember.id},id=${id})}" method="post">
+                    <button class="w-100 btn btn-danger btn-lg" name="unfollow" value="unfollow">UnFollow</button>
+                </form>
+            </div>
+
+        </div>
+        <div class="row">
             <div class="col" th:if="${loginMember.id==id}">
                 <button class="w-100 btn btn-secondary btn-lg" type="button"
                         th:onclick="|location.href='@{/members/{id}/update (id=${loginMember.id})}'|">

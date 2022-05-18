@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FollowRepository extends JpaRepository<Follow,Long> {
 
     Follow findFollowByFromMemberAndToMember(Member fromMember,Member toMember);
+
+
 }

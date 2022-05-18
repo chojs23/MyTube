@@ -5,12 +5,14 @@ import com.mytube.Controller.form.MemberForm;
 import com.mytube.Controller.form.MemberJoinForm;
 import com.mytube.Controller.form.MemberLoginForm;
 import com.mytube.Controller.form.MemberUpdateForm;
+import com.mytube.domain.Follow;
 import com.mytube.domain.Member;
 import com.mytube.domain.MemberImage;
 import com.mytube.domain.Post;
 import com.mytube.dto.memberDto;
 import com.mytube.dto.postDto;
 import com.mytube.exception.MemberNotFoundException;
+import com.mytube.repository.FollowRepository;
 import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
 import com.mytube.upload.UploadImage;
@@ -55,6 +57,8 @@ public class MemberController {
     private final MemberService memberService;
     private final PostService postService;
     private final UploadImage uploadImage;
+    private final FollowRepository followRepository;
+
     //@GetMapping("/members")
     public String showMembers(Model model) {
         //List<Member> members = memberService.findMembers();
@@ -72,7 +76,7 @@ public class MemberController {
                 Sort.Direction.DESC,sortBy.orElse("id")
         ));
 
-        Page<memberDto> members = memberPage.map(m -> new memberDto(m.getId(),m.getUserId(),m.getUserEmail(),m.getCreatedDate()));
+        Page<memberDto> members = memberPage.map(m -> new memberDto(m));
         log.info("members ={}", members);
         //List<Member> members = memberPage.getContent();
 
@@ -130,8 +134,20 @@ public class MemberController {
         MemberForm memberForm = new MemberForm(member.getUserId(), member.getUserEmail(), MemberPostsDto, filename);
 
         log.info("memberForm "+ memberForm);
+
+        if (!loginMember.getId().equals(id)) {
+            Long followId = memberService.getFollowId(loginMember.getId(), id);
+            if (followId!=null){
+                model.addAttribute("followed", true);
+            }
+            else{
+                model.addAttribute("followed", false);
+            }
+        }
+
         model.addAttribute("form",memberForm);
-        model.addAttribute("loginMember",loginMember);
+        model.addAttribute("loginMember",new memberDto(loginMember));
+
         return "/members/memberInfo";
     }
 
@@ -244,14 +260,7 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @PostMapping("members/{follower}/follow/{target}")
-    public String follow(@PathVariable Long follower, @PathVariable Long target, RedirectAttributes redirectAttributes) {
 
-
-
-        redirectAttributes.addAttribute("follower", follower);
-        return "redirect:/members/{follower}/info";
-    }
 
     @GetMapping("members/login")
     public String loginForm(@ModelAttribute("form") MemberLoginForm form) {
