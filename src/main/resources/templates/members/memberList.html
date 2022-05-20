@@ -17,17 +17,16 @@
                 <th>이름</th>
                 <th>Email</th>
                 <th>생성일자</th>
-                <th>정보보기</th>
+                <th>게시글 수</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="member : ${members}">
                 <td th:text="${member.id}"></td>
-
                 <td ><a th:href="@{/members/{id}/info (id=${member.getId()})}" th:text="${member.userId}"></a></td>
-
                 <td th:text="${member.userEmail}"></td>
                 <td th:text="${member.createdDate}"></td>
+                <td th:text="${member.posts.size()}"></td>
 
             </tr>
             </tbody>

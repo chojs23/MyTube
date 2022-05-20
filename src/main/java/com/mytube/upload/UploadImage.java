@@ -33,7 +33,7 @@ public class UploadImage {
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
         multipartFile.transferTo(new File(getFullPath(storeFileName)));
-        Member member = memberService.findMember(id).get();
+        Member member = memberService.findMember(id);
 
         return new MemberImage(member,originalFilename, storeFileName,getFullPath(storeFileName));
     }

@@ -5,15 +5,19 @@ spring:
     username: sa
     password: 1234
   jpa:
-    database-platform:
+
     hibernate:
       ddl-auto: create
     properties:
-      show_sql: true
       hibernate:
-        format_sql: true
+        format_sql : true
+        default_batch_fetch_size : 100
+
+
+
   session:
     timeout: 30m
+
   servlet:
     multipart:
       enabled: true

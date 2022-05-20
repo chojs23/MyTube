@@ -3,6 +3,7 @@ package com.mytube.domain;
 
 import com.mytube.domain.BaseEntities.BaseTimeEntity;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -48,6 +49,12 @@ public class Member extends BaseTimeEntity {
         this.password=password;
         this.userEmail=userEmail;
         this.memberImage=memberImage;
+    }
+    public void updateMember(String userId,String password,String userEmail){
+        this.userId=userId;
+        this.password=password;
+        this.userEmail=userEmail;
+
     }
 
     @Builder

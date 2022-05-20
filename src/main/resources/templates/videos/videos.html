@@ -32,7 +32,7 @@
                 <tr>
                     <td th:text="${video.id}">
                     <td ><a th:href="@{/videos/{id}/detail (id=${video.getId()})}" th:text="${video.title}"></a></td>
-                    <td th:text="${video.member.userId}"></td>
+                    <td ><a th:href="@{/members/{id}/info (id=${video.getMember().getId()})}" th:text="${video.member.userId}">></a></td>
                     <td th:text="${video.createdDate}"></td>
                     <td th:text="${video.lastModifiedDate}"></td>
 
@@ -62,6 +62,6 @@
             </button>
         </div>
     </div>
-
+</div>
 </body>
 </html>

@@ -40,7 +40,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -121,17 +120,17 @@ public class MemberController {
 //        if (!id.equals(loginMember.getId())){
 //            return "redirect:/";
 //        }
-        List<Post> postsFromMember = postService.getPostsFromMember(id);
 
+        //List<Post> postsFromMember = postService.getPostsFromMember(id);
+
+        Member member = memberService.findMember(id);
+        List<Post> postsFromMember = member.getPosts();
         List<postDto> MemberPostsDto = postsFromMember.stream().map(postDto::new).collect(Collectors.toList());
 
-        Member member = memberService.findMember(id).get();
+
         MemberImage memberImage = member.getMemberImage();
-        String filename = null;
-        if (memberImage != null) {
-            filename = memberImage.getSavedName();
-        }
-        MemberForm memberForm = new MemberForm(member.getUserId(), member.getUserEmail(), MemberPostsDto, filename);
+
+        MemberForm memberForm = new MemberForm(member.getUserId(), member.getUserEmail(), MemberPostsDto, member.getMemberImage().getSavedName());
 
         log.info("memberForm "+ memberForm);
 
@@ -164,12 +163,9 @@ public class MemberController {
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
-        Optional<Member> findMember = memberService.findMember(id);
-        if(findMember.isEmpty()){
-            log.info("update member err");
-            return "/home";
-        }
-        Member member = findMember.get();
+        Member member = memberService.findMember(id);
+
+
         MemberUpdateForm form = new MemberUpdateForm();
 
         form.setUserId(member.getUserId());
@@ -234,7 +230,7 @@ public class MemberController {
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관
 
-        session.setAttribute(SessionConst.LOGIN_MEMBER, memberService.findMember(loginMember.getId()).get());
+        session.setAttribute(SessionConst.LOGIN_MEMBER, memberService.findMember(loginMember.getId()));
 
         redirectAttributes.addAttribute("id", id);
 
@@ -249,7 +245,7 @@ public class MemberController {
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
-        Member member = memberService.findMember(id).get();
+        Member member = memberService.findMember(id);
         memberService.withdrawal(member);
 
         HttpSession session = request.getSession(false);

@@ -34,6 +34,7 @@ public class MemberService {
     public Long join(Member member){
         log.info("Join member = "+member);
         memberRepository.save(member);
+        memberImageRepository.save(new MemberImage(member, null, null, null));
         return member.getId();
     }
 
@@ -56,34 +57,30 @@ public class MemberService {
      */
 
     public Page<Member> getMemberPage(Pageable pageable){
-        return memberRepository.findAll(pageable);
+        return memberRepository.findAllMemberPage(pageable);
     }
 
-    public Optional<Member> findMember(Long id){
-        return memberRepository.findById(id);
+    public Member findMember(Long id){
+        return memberRepository.findById(id).orElseThrow(()->new MemberNotFoundException("ex"));
     }
 
     @Transactional
     public boolean updateMember(Long id, MemberUpdateForm form){
         Optional<Member> findMember = memberRepository.findById(id);
 
-        if(!findMember.isPresent()){
-            log.info("isPresent false");
-            return false;
-        }
+
         Member member = findMember.get();
         log.info("member = " + member);
 
         MemberImage formMemberImage = form.getMemberImage();
-        if (formMemberImage==null){
-            formMemberImage = new MemberImage(member, null, null, null);
+        if (formMemberImage!=null){
+            MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(member.getId()).get();
+            memberImageByMember_id.updateMemberImage(formMemberImage.getOrigFileName(),formMemberImage.getSavedName(),formMemberImage.getFilePath());
+            //member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),formMemberImage);
         }
-        MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(id).orElse(formMemberImage);
-        memberImageByMember_id.updateMemberImage(formMemberImage.getOrigFileName(),formMemberImage.getSavedName(),formMemberImage.getFilePath());
-        log.info("memberImageByMember = " + memberImageByMember_id);
-        CommonUtils.saveIfNullId(memberImageByMember_id.getId(),memberImageRepository,memberImageByMember_id);
-
-        member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),memberImageByMember_id);
+        else{
+            member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail());
+        }
         Member save = memberRepository.save(member);
         log.info("save = " + save);
         return true;
