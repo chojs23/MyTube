@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,22 +38,42 @@ public class PostController {
 
     private final PostService postService;
 
+
+
     @GetMapping("/posts")
     public String posts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
-                        @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy){
+                        @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy
+                        ){
         model.addAttribute("loginMember", loginMember);
+
 
         Page<Post> postPage = postService.getPostPage(PageRequest.of(
                 page.orElse(0),
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
-        Page<postDto> posts = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
-        log.info("posts = " + posts);
-        model.addAttribute("posts",posts);
+        Page<postDto> postsDto = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        log.info("posts = " + postsDto);
+        model.addAttribute("posts",postsDto);
 
         return "posts/posts";
     }
+
+    @GetMapping("/posts/search")
+    public String search(String keyword, Model model,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy) {
+        Page<Post> searchList = postService.search(keyword, PageRequest.of(
+                page.orElse(0),
+                3,
+                Sort.Direction.DESC,sortBy.orElse("createdDate")));
+        Page<postDto> searchListDto = searchList.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        model.addAttribute("searchList", searchListDto);
+        model.addAttribute("loginMember", loginMember);
+        model.addAttribute("keyword", keyword);
+        return "posts/posts-search";
+    }
+
 
     @GetMapping("/posts/new")
     public String createPost(Model model){

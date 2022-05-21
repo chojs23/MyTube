@@ -66,6 +66,12 @@ public class PostService {
         return postRepository.findById(id);
     }
 
+    @Transactional
+    public Page<Post> search(String keyword,Pageable pageable) {
+        Page<Post> postsList = postRepository.findByTitleContaining(keyword,pageable);
+        return postsList;
+    }
+
     public List<Post> getPostsFromMember(Long id){
         return postRepository.findPostsByMember_Id(id);
     }
@@ -76,5 +82,13 @@ public class PostService {
 
     public Page<Post> getPostPage(Pageable pageable){
         return postRepository.findAll(pageable);
+    }
+    public Page<Post> getPostPage(String keyword,Pageable pageable){
+        if (keyword.isEmpty()) {
+            return postRepository.findAll(pageable);
+        }
+        else{
+            return postRepository.findByTitleContaining(keyword, pageable);
+        }
     }
 }

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header">
+  <title>posts</title>
+  <meta charset="utf-8">
+  <link th:href="@{/css/bootstrap.min.css}"
+        href="css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container" style="max-width: 1000px">
+  <div th:replace="fragments/bodyHeader :: bodyHeader" />
+  <div class="py-5 text-center">
+    <h2>글 게시판</h2>
+  </div>
+  <h4 class="mb-3" th:if="${loginMember != null}" th:text="|로그인: ${loginMember.userId}|">로그인 사용자 이름</h4>
+  <h4 class="mb-3" th:unless="${loginMember != null}" th:text="|비로그인|">비로그인</h4>
+
+  <hr class="my-4">
+  <div class="row">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일자</th>
+        <th>수정일자</th>
+      </tr>
+      </thead>
+      <tbody>
+      <th:block th:each="post:${searchList}">
+        <tr>
+          <td th:text="${post.id}">
+          <td><a th:href="@{/posts/{id}/detail (id=${post.getId()})}" th:text="${post.title}"></a></td>
+          <td><a th:href="@{/members/{id}/info (id=${post.getMember().getId()})}" th:text="${post.member.userId}">></a></td>
+          <td th:text="${post.createdDate}"></td>
+          <td th:text="${post.lastModifiedDate}"></td>
+        </tr>
+      </th:block>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div th:if="${searchList.totalPages != 0}" class="text-center">
+    <ul class="pagination">
+      <li th:each="page : ${#numbers.sequence(0, searchList.totalPages - 1)}">
+        <a th:href="@{/posts/search (keyword=${keyword}, page=${pageStat.index})}" th:text="${pageStat.index + 1}"></a>
+        &nbsp;
+      </li>
+    </ul>
+  </div>
+
+  <form action="/posts/search" method="GET" class="form-inline p-2 bd-highlight" role="search">
+    <input type="text" name="keyword" class="form-control" id="search" placeholder="검색">
+    <button class="btn btn-success">검색</button>
+  </form>
+
+  <div class="row">
+    <div class="col-sm-5">
+    </div>
+    <div class="col-sm-5">
+      <button class="btn btn-primary btn-sm" type="button"
+              th:onclick="|location.href='@{/posts/new}'|">
+        글 쓰기
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
