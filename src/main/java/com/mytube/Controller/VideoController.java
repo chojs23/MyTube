@@ -54,6 +54,21 @@ public class VideoController {
         return "/videos/videos";
     }
 
+    @GetMapping("/videos/search")
+    public String search(String keyword, Model model,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy) {
+        Page<Video> searchList = videoService.search(keyword, PageRequest.of(
+                page.orElse(0),
+                10,
+                Sort.Direction.DESC,sortBy.orElse("createdDate")));
+        Page<videoDto> searchListDto = searchList.map(v -> new videoDto(v.getId(), v.getTitle(), v.getAttachFile(), v.getMember(), v.getCreatedDate(), v.getLastModifiedDate()));
+        model.addAttribute("searchList", searchListDto);
+        model.addAttribute("loginMember", loginMember);
+        model.addAttribute("keyword", keyword);
+        return "videos/videos-search";
+    }
+
 
     @GetMapping("/videos/new")
     public String createVideo(Model model){

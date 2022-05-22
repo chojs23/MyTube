@@ -65,7 +65,7 @@ public class PostController {
                          @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy) {
         Page<Post> searchList = postService.search(keyword, PageRequest.of(
                 page.orElse(0),
-                3,
+                10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
         Page<postDto> searchListDto = searchList.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
         model.addAttribute("searchList", searchListDto);

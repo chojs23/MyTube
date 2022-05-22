@@ -24,12 +24,18 @@ public class VideoService {
         return videoRepository.findAll(pageable);
     }
 
+    public Page<Video> search(String keyword,Pageable pageable) {
+        return videoRepository.findByTitleContaining(keyword, pageable);
+    }
+
     @Transactional
     public Long uploadVideo(Video video){
         log.info("create new video = " + video);
         videoRepository.save(video);
         return video.getId();
     }
+
+
 
     public Video getVideo(Long id){
         return videoRepository.findById(id).get();
