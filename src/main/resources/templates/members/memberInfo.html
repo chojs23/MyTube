@@ -30,8 +30,14 @@
             <input type="text" id="userEmail" th:field="*{userEmail}"
                    class="form-control"
                    disabled>
+        </div>
+
+        <div class="row">
+            <span th:text="|팔로워 수 ${form.getFollowers().size()}|"></span>
+            <span th:text="|팔로잉 수 ${form.getFollowings().size()}|"></span>
 
         </div>
+
         <hr class="my-4">
         <div class="row">
             <div class="col" th:if="${loginMember!=null and loginMember.id!=id and followed==false}">

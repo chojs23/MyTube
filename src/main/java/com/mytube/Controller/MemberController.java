@@ -121,15 +121,14 @@ public class MemberController {
 //            return "redirect:/";
 //        }
 
-        //List<Post> postsFromMember = postService.getPostsFromMember(id);
+        List<postDto> postsFromMember = postService.getPostsFromMember(id).stream().map(postDto::new).collect(Collectors.toList());
+
 
         Member member = memberService.findMember(id);
-        List<Post> postsFromMember = member.getPosts();
-        List<postDto> MemberPostsDto = postsFromMember.stream().map(postDto::new).collect(Collectors.toList());
 
-        MemberForm memberForm = new MemberForm(member.getUserId(), member.getUserEmail(), MemberPostsDto, member.getMemberImage().getSavedName());
+        memberDto memberDto = new memberDto(member,postsFromMember);
 
-        log.info("memberForm "+ memberForm);
+        log.info("memberDto "+ memberDto);
 
         if (!loginMember.getId().equals(id)) {
             Long followId = memberService.getFollowId(loginMember.getId(), id);
@@ -141,7 +140,7 @@ public class MemberController {
             }
         }
 
-        model.addAttribute("form",memberForm);
+        model.addAttribute("form",memberDto);
         model.addAttribute("loginMember",new memberDto(loginMember));
 
         return "/members/memberInfo";

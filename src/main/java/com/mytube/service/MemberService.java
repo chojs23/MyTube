@@ -60,21 +60,22 @@ public class MemberService {
         return memberRepository.findAllMemberPage(pageable);
     }
 
+
     public Member findMember(Long id){
         return memberRepository.findById(id).orElseThrow(()->new MemberNotFoundException("ex"));
     }
 
     @Transactional
     public boolean updateMember(Long id, MemberUpdateForm form){
-        Optional<Member> findMember = memberRepository.findById(id);
+        Member member = memberRepository.findById(id).orElseThrow(()->new MemberNotFoundException("ex"));
 
 
-        Member member = findMember.get();
         log.info("member = " + member);
 
         MemberImage formMemberImage = form.getMemberImage();
         if (formMemberImage!=null){
-            MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(member.getId()).get();
+            //MemberImage memberImageByMember_id = memberImageRepository.findMemberImageByMember_Id(member.getId()).get();
+            MemberImage memberImageByMember_id = member.getMemberImage();
             memberImageByMember_id.updateMemberImage(formMemberImage.getOrigFileName(),formMemberImage.getSavedName(),formMemberImage.getFilePath());
             //member.updateMember(form.getUserId(),form.getNewPassword(),form.getUserEmail(),formMemberImage);
         }
