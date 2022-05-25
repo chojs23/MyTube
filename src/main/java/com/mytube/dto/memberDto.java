@@ -10,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class memberDto {
 
     private Set<Follow> followers;
 
-    private List<postDto> posts;
+    private List<postDto> posts=new ArrayList<>();
 
 
     public memberDto(Member member){
