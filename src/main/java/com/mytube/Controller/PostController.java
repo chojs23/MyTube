@@ -74,6 +74,24 @@ public class PostController {
         return "posts/posts-search";
     }
 
+    @GetMapping("/posts/subscription")
+    public String followPosts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
+                        @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy
+    ){
+        model.addAttribute("loginMember", loginMember);
+
+
+        Page<Post> postPage = postService.getFollowingPosts(loginMember.getId(), PageRequest.of(
+                page.orElse(0),
+                10,
+                Sort.Direction.DESC,sortBy.orElse("createdDate")));
+
+        Page<postDto> postsDto = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        log.info("posts = " + postsDto);
+        model.addAttribute("posts",postsDto);
+
+        return "posts/posts";
+    }
 
     @GetMapping("/posts/new")
     public String createPost(Model model){

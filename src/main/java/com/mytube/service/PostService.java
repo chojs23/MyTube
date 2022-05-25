@@ -83,6 +83,11 @@ public class PostService {
     public Page<Post> getPostPage(Pageable pageable){
         return postRepository.findAll(pageable);
     }
+
+    public Page<Post> getFollowingPosts(Long id,Pageable pageable) {
+        return postRepository.findFollowingPosts(id,pageable);
+    }
+
     public Page<Post> getPostPage(String keyword,Pageable pageable){
         if (keyword.isEmpty()) {
             return postRepository.findAll(pageable);

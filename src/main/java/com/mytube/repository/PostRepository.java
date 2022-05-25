@@ -13,5 +13,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.member.id = :id")
     List<Post> findPostsByMember_Id(@Param("id") Long id);
 
+    @Query("select p from Post p where p.member in (select f.toMember from Follow f where f.fromMember.id=:id)")
+    Page<Post> findFollowingPosts(@Param("id") Long id,Pageable pageable);
+
     Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 }
