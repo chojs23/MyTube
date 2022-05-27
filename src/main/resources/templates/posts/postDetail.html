@@ -4,8 +4,36 @@
     <meta charset="utf-8">
     <link th:href="@{/css/bootstrap.min.css}"
           href="../css/bootstrap.min.css" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 
 </head>
+
+<script type="text/javascript">
+    function addComment (){
+        const data = {
+            postId:$("#id").val(),
+            comment:$("#comment").val()
+        };
+        if (!data.comment || data.comment.trim() === "") {
+            alert("공백 또는 입력하지 않은 부분이 있습니다.");
+            return false;
+        }else {
+            $.ajax({
+                type: 'POST',
+                url: '/api/posts/' + data.postId + '/comments',
+                dataType: 'text', //TODO datatype:'json' 으로 하면 {"readyState":4,"responseText":"","status":200,"statusText":"parsererror"} 에러 뜸 왜???
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(data)
+            }).done(function () {
+                alert('댓글이 등록되었습니다.');
+                window.location.reload();
+            }).fail(function (error) {
+                alert(JSON.stringify(error));
+            })
+        }
+    }
+</script>
+
 <body>
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader" />
@@ -17,8 +45,8 @@
         <div>
             <label for="title">제목</label>
             <input type="text" id="title" th:field="*{title}" class="form-control" disabled>
-
         </div>
+
         <div>
             <label for="content">내용</label>
             <textarea  rows="8" type="text" id="content" th:field="*{content}"
@@ -26,10 +54,47 @@
                    disabled>
                 </textarea>
         </div>
+
+        <!-- 댓글 -->
+        <div th:class="card">
+            <div th:class="card-header" th:text="|*{comments.size()} comments|"> Comments </div>
+            <ul th:class="list-group-flush">
+                <li th:each="comment:*{comments}" th:class="list-group-item">
+                    <span>
+                        <span style="font-size:small" th:text="${comment.member.userId}"></span>
+                        <span style="font-size:xx-small" th:text="${comment.createdDate}"></span>
+                        <button class="badge">수정</button>
+                        <button class="badge">삭제</button>
+                    </span>
+                    <div th:text="${comment.comment}"></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 댓글작성 -->
+        <div th:class="card">
+            <div th:class="card-header" > Write Comment </div>
+            <form>
+                <input type="hidden" th:field="*{id}">
+                <div th:if="${loginMember}!=null">
+                    <div th:class="card-body">
+                        <textarea id="comment" class="form-control" rows="4" placeholder="댓글을 입력하세요"></textarea>
+                    </div>
+                    <div th:class="footer">
+                        <button type="button" class="btn btn-outline-primary" id="btn-comment-save" onclick="return addComment()" > 등록</button>
+                    </div>
+                </div>
+                <div th:unless="${loginMember}!=null">
+                    <div class="card-body" style="font-size: small"> <a href="/members/login">로그인</a>을 하시고 댓글을 달아보세요.</div>
+                </div>
+            </form>
+        </div>
+
         <div th:if="${loginMember} != null and ${loginMember.id}==*{member.id} " th:class="form-control">
             <a th:href="@{/posts/{id}/update (id=*{id})}" th:text="수정하기"></a>
             <a th:href="@{/posts/{id}/delete (id=*{id})}" th:text="삭제하기"></a>
         </div>
+
     </div>
 </div> <!-- /container -->
 </body>

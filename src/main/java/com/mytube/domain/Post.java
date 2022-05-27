@@ -5,6 +5,8 @@ import com.mytube.domain.BaseEntities.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +29,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name="member_id")
     private Member member;
 
+    @OneToMany(mappedBy = "post",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Comment> comments=new ArrayList<>();
 
     public void updatePost(String title,String content){
         this.title=title;
@@ -39,4 +43,6 @@ public class Post extends BaseEntity {
         this.content=content;
         this.member=member;
     }
+
+
 }
