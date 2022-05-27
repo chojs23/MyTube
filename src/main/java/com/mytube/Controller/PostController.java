@@ -52,7 +52,7 @@ public class PostController {
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
-        Page<postDto> postsDto = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        Page<postDto> postsDto = postPage.map(p -> new postDto(p));
         log.info("posts = " + postsDto);
         model.addAttribute("posts",postsDto);
 
@@ -67,7 +67,7 @@ public class PostController {
                 page.orElse(0),
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
-        Page<postDto> searchListDto = searchList.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        Page<postDto> searchListDto = searchList.map(p -> new postDto(p));
         model.addAttribute("searchList", searchListDto);
         model.addAttribute("loginMember", loginMember);
         model.addAttribute("keyword", keyword);
@@ -86,7 +86,7 @@ public class PostController {
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
-        Page<postDto> postsDto = postPage.map(p -> new postDto(p.getId(), p.getTitle(), p.getContent(), p.getMember(),p.getCreatedDate(),p.getLastModifiedDate()));
+        Page<postDto> postsDto = postPage.map(p -> new postDto(p));
         log.info("posts = " + postsDto);
         model.addAttribute("posts",postsDto);
 
@@ -132,8 +132,7 @@ public class PostController {
             return "redirect:/posts";
         }
         Post findPost = post.get();
-        postDto postDto = new postDto(findPost.getId(), findPost.getTitle(), findPost.getContent(),
-                findPost.getMember(), findPost.getCreatedDate(), findPost.getLastModifiedDate());
+        postDto postDto = new postDto(findPost);
 
         model.addAttribute("postDto", postDto);
         model.addAttribute("loginMember", loginMember);

@@ -75,7 +75,7 @@ public class MemberController {
                 Sort.Direction.DESC,sortBy.orElse("id")
         ));
 
-        Page<memberDto> members = memberPage.map(m -> new memberDto(m));
+        Page<memberDto> members = memberPage.map(m -> new memberDto(m, m.getPosts().stream().map(postDto::new).collect(Collectors.toList())));
         log.info("members ={}", members);
         //List<Member> members = memberPage.getContent();
 

@@ -14,10 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +24,7 @@ import java.net.URISyntaxException;
 
 @Slf4j
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberApiController {
     private final SignUpFormValidator signUpFormValidator;
@@ -36,7 +34,7 @@ public class MemberApiController {
     private final PostService postService;
     private final UploadImage uploadImage;
 
-    @PostMapping("/api/members/{fromId}/follow/{toId}")
+    @PostMapping("/members/{fromId}/follow/{toId}")
     public ResponseEntity<Object> follow (@PathVariable Long fromId, @PathVariable Long toId) throws URISyntaxException {
 
         URI redirectUri = new URI("http://localhost:8080/members/"+fromId+"/info");
@@ -54,7 +52,7 @@ public class MemberApiController {
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
 
-    @PostMapping("/api/members/{fromId}/unfollow/{toId}")
+    @PostMapping("/members/{fromId}/unfollow/{toId}")
     public ResponseEntity<Object> unfollow (@PathVariable Long fromId, @PathVariable Long toId) throws URISyntaxException {
 
         URI redirectUri = new URI("http://localhost:8080/members/"+fromId+"/info");
