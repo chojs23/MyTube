@@ -34,14 +34,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m join fetch m.memberImage mi where m.id=:id")
     Optional<Member> findById(@Param("id") Long id);
 
-    @Query("select m from Member m join fetch m.memberImage mi where m.id=:id")
-    Optional<Member> findByIdWithoutImage(@Param("id") Long id);
 
-    @Query("select m from Member m where m.userId=:userId")
+
+    @Query("select m from Member m join fetch m.memberImage where m.userId=:userId")
     Optional<Member> findMemberByUserId(@Param("userId") String userId);
 
-    @Query("select m from Member m where m.userId=:userId")
-    Optional<Member> findMemberByUserIdWithoutImage(@Param("userId") String userId);
+
 
 
 
