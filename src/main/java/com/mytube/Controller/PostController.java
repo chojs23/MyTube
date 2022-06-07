@@ -100,7 +100,9 @@ public class PostController {
         return "posts/createPostForm";
     }
 
-
+    //TODO 세션에 엔티티 보관 X 엔티티를 세션에 보관하면 안됩니다. 세션에는 DTO를 보관해주세요. 지금 세션에 member 엔티티를 보관하고,
+    // 또 해당 엔티티를 엮어서 그대로 Post와 함께 persist하기 때문에 post를 다시 조회할 때 세션에 보관된 member가 조회되는 현상이 발생합니다.
+    // 이 member는 프록시 기능을 상실한 상태이기 때문에 이런 문제가 발생합니다.
     @PostMapping("/posts/new")
     public String createPost(@Valid @ModelAttribute("form") PostCreateForm form, BindingResult result, Model model,
                              @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
