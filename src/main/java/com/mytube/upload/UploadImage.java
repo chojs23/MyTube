@@ -24,7 +24,7 @@ public class UploadImage {
     private String memberImageDir;
 
     public String getFullPath(String filename) {
-
+        log.info("fullPath = " + memberImageDir + filename);
         return memberImageDir + filename;
     }
 
@@ -35,6 +35,7 @@ public class UploadImage {
         }
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(originalFilename);
+        log.info("storeFileName = "+ storeFileName);
         multipartFile.transferTo(new File(getFullPath(storeFileName)));
         Member member = memberService.findMember(id);
 
