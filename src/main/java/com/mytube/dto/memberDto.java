@@ -9,6 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+// TODO @NoArgsConstructor modelmapper 오류 Ensure that has a non-private no-argument constructor.
 @ToString(of = {"id","userId","password","userEmail"})
-public class memberDto {
+public class memberDto implements Serializable {
     private Long id;
 
     private String userId;
@@ -38,6 +39,9 @@ public class memberDto {
 
     private List<postDto> posts=new ArrayList<>();
 
+    public memberDto(){
+
+    }
 
     public memberDto(Member member){
         this.id = member.getId();

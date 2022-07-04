@@ -5,6 +5,7 @@ import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.Controller.form.PostCreateForm;
 import com.mytube.domain.Member;
 import com.mytube.domain.Post;
+import com.mytube.exception.PostNotFoundException;
 import com.mytube.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +63,12 @@ public class PostService {
         return post;
     }
 
-    public Optional<Post> getPost(Long id){
-        return postRepository.findById(id);
+    public Post getPost(Long id){
+        Optional<Post> post = postRepository.findById(id);
+        if (post.isEmpty()) {
+            throw new PostNotFoundException(String.format("There is no post id = %s", id));
+        }
+        return post.get();
     }
 
     @Transactional

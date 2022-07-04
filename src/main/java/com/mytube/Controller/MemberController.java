@@ -21,6 +21,7 @@ import com.mytube.web.validator.MemberUpdateFormValidator;
 import com.mytube.web.validator.SignUpFormValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -53,6 +54,7 @@ public class MemberController {
     private final SignUpFormValidator signUpFormValidator;
     private final MemberUpdateFormValidator memberUpdateFormValidator;
 
+    private final ModelMapper modelMapper;
     private final MemberService memberService;
     private final PostService postService;
     private final UploadImage uploadImage;
@@ -115,7 +117,7 @@ public class MemberController {
 
 
     @GetMapping("members/{id}/info")
-    public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
+    public String info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember, Model model,
                        @PathVariable Long id){
 //        if (!id.equals(loginMember.getId())){
 //            return "redirect:/";
@@ -141,7 +143,7 @@ public class MemberController {
         }
 
         model.addAttribute("form",memberDto);
-        model.addAttribute("loginMember",new memberDto(loginMember));
+        model.addAttribute("loginMember",loginMember);
 
         return "/members/memberInfo";
     }
@@ -155,7 +157,7 @@ public class MemberController {
 
     @GetMapping("members/{id}/update")
     public String updateForm(@PathVariable Long id,Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember){
         if (!id.equals(loginMember.getId())){
             return "redirect:/";
         }
@@ -183,7 +185,7 @@ public class MemberController {
      */
     @PostMapping("members/{id}/update")
     public String update(@PathVariable Long id, Model model, @Valid @ModelAttribute("form") MemberUpdateForm form, Errors errors,
-                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
                          HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
 
         if (!id.equals(loginMember.getId())){
@@ -204,7 +206,10 @@ public class MemberController {
 //        }
         form.setOldUserId(loginMember.getUserId());
         form.setOldUserEmail(loginMember.getUserEmail());
-        form.setLoginMemberPassword(loginMember.getPassword());
+
+        Member member = memberService.findMember(loginMember.getId());
+
+        form.setLoginMemberPassword(member.getPassword());
 
         memberUpdateFormValidator.validate(form, errors);
         if (errors.hasErrors()) {
@@ -216,17 +221,14 @@ public class MemberController {
 
         form.setMemberImage(memberImage);
 
-        boolean b = memberService.updateMember(id, form);
+        Member updateMember = memberService.updateMember(id, form);
 
-        if (!b){
-            log.info("update member err");
-            return "members/memberUpdateForm";
-        }
 
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관
 
-        session.setAttribute(SessionConst.LOGIN_MEMBER, memberService.findMember(loginMember.getId()));
+        memberDto updatedMember = modelMapper.map(updateMember, memberDto.class);
+        session.setAttribute(SessionConst.LOGIN_MEMBER, updatedMember);
 
         redirectAttributes.addAttribute("id", id);
 
@@ -235,8 +237,8 @@ public class MemberController {
 
     @PostMapping("members/{id}/withdrawal")
     public String withdrawal(@PathVariable Long id, Model model,
-                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
-                         HttpServletRequest request) throws IOException {
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
+                         HttpServletRequest request) {
 
         if (!id.equals(loginMember.getId())){
             return "redirect:/";

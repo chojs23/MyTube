@@ -5,6 +5,7 @@ import com.mytube.domain.Member;
 import com.mytube.domain.MemberImage;
 import com.mytube.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +17,14 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UploadImage {
     private final MemberService memberService;
     @Value("${custom.path.memberImage}")
     private String memberImageDir;
 
     public String getFullPath(String filename) {
+
         return memberImageDir + filename;
     }
 

@@ -6,12 +6,15 @@ import com.mytube.Controller.form.MemberUpdateForm;
 import com.mytube.Controller.form.PostCreateForm;
 import com.mytube.domain.Member;
 import com.mytube.domain.Post;
+import com.mytube.dto.memberDto;
 import com.mytube.dto.postDto;
 import com.mytube.repository.PostRepository;
+import com.mytube.service.MemberService;
 import com.mytube.service.PostService;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,11 +41,12 @@ public class PostController {
 
     private final PostService postService;
 
-
+    private final MemberService memberService;
+    private final ModelMapper modelMapper;
 
     @GetMapping("/posts")
-    public String posts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
-                        @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy
+    public String posts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember, Model model,
+                        @RequestParam Optional<Integer> page, @RequestParam Optional<String> sortBy
                         ){
         model.addAttribute("loginMember", loginMember);
 
@@ -61,7 +65,7 @@ public class PostController {
 
     @GetMapping("/posts/search")
     public String search(String keyword, Model model,
-                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
                          @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy) {
         Page<Post> searchList = postService.search(keyword, PageRequest.of(
                 page.orElse(0),
@@ -75,7 +79,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/subscription")
-    public String followPosts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
+    public String followPosts(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember, Model model,
                         @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy
     ){
         model.addAttribute("loginMember", loginMember);
@@ -105,7 +109,7 @@ public class PostController {
     // 이 member는 프록시 기능을 상실한 상태이기 때문에 이런 문제가 발생합니다.
     @PostMapping("/posts/new")
     public String createPost(@Valid @ModelAttribute("form") PostCreateForm form, BindingResult result, Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember){
         if (loginMember==null){
             return "redirect:/home";
         }
@@ -115,7 +119,9 @@ public class PostController {
             return "posts/createPostForm";
         }
 
-        Post post = form.toEntity(form.getTitle(), form.getContent(), loginMember);
+        Member member = memberService.findMember(loginMember.getId());
+
+        Post post = form.toEntity(form.getTitle(), form.getContent(), member);
         Long postId = postService.createPost(post);
         log.info("post id = " + postId);
 
@@ -126,15 +132,12 @@ public class PostController {
 
     @GetMapping("/posts/{id}/detail")
     public String postDetail(@PathVariable Long id, Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
-        Optional<Post> post = postService.getPost(id);
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember) {
+        Post post = postService.getPost(id);
 
-        if (post.isEmpty()){
-            log.info("PostDetail => Empty post");
-            return "redirect:/posts";
-        }
-        Post findPost = post.get();
-        postDto postDto = new postDto(findPost);
+
+
+        postDto postDto = new postDto(post);
 
         model.addAttribute("postDto", postDto);
         model.addAttribute("loginMember", loginMember);
@@ -143,21 +146,18 @@ public class PostController {
 
     }
     @GetMapping("/posts/{id}/update")
-    public String UpdatePostForm(@PathVariable Long id, Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
-        Optional<Post> post = postService.getPost(id);
-        if (post.isEmpty()){
-            log.info("PostDetail => Empty post");
-            return "redirect:/posts";
-        }
+    public String updatePostForm(@PathVariable Long id, Model model,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember){
+        Post post = postService.getPost(id);
 
-        if (loginMember==null || !loginMember.getId().equals(post.get().getMember().getId())){
+
+        if (loginMember==null || !loginMember.getId().equals(post.getMember().getId())){
             return "redirect:/posts/{id}/detail";
         }
 
 
-        Post findPost = post.get();
-        PostCreateForm postCreateForm = new PostCreateForm(findPost.getTitle(), findPost.getContent(), findPost.getMember());
+
+        PostCreateForm postCreateForm = new PostCreateForm(post.getTitle(), post.getContent(), post.getMember());
         model.addAttribute("form", postCreateForm);
         model.addAttribute("loginMember", loginMember);
 
@@ -166,10 +166,10 @@ public class PostController {
     }
 
     @PostMapping("/posts/{id}/update")
-    public String UpdatePost(@PathVariable Long id,@Valid @ModelAttribute("form") PostCreateForm form,BindingResult result,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+    public String updatePost(@PathVariable Long id,@Valid @ModelAttribute("form") PostCreateForm form,BindingResult result,
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
                              RedirectAttributes redirectAttributes) {
-        Post post = postService.getPost(id).get();
+        Post post = postService.getPost(id);
         Member member = post.getMember();
         if (!loginMember.getId().equals(member.getId())){
             log.info("잘못된 사용자 게시글 수정");
@@ -189,9 +189,9 @@ public class PostController {
     }
 
     @GetMapping("/posts/{id}/delete")
-    public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+    public String deletePost(@PathVariable Long id,@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
                              RedirectAttributes redirectAttributes){
-        Post post = postService.getPost(id).get();
+        Post post = postService.getPost(id);
         Member member = post.getMember();
         if (!loginMember.getId().equals(member.getId())){
             log.info("잘못된 사용자 게시글 삭제");

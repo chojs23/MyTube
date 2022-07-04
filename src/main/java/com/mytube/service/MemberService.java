@@ -66,7 +66,7 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean updateMember(Long id, MemberUpdateForm form){
+    public Member updateMember(Long id, MemberUpdateForm form){
         Member member = memberRepository.findById(id).orElseThrow(()->new MemberNotFoundException("ex"));
 
 
@@ -84,7 +84,7 @@ public class MemberService {
         }
         Member save = memberRepository.save(member);
         log.info("save = " + save);
-        return true;
+        return save;
     }
 
     @Transactional

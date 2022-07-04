@@ -6,13 +6,16 @@ import com.mytube.domain.Member;
 import com.mytube.domain.Post;
 import com.mytube.domain.Video;
 import com.mytube.domain.VideoFile;
+import com.mytube.dto.memberDto;
 import com.mytube.dto.postDto;
 import com.mytube.dto.videoDto;
+import com.mytube.service.MemberService;
 import com.mytube.service.VideoService;
 import com.mytube.upload.UploadVideo;
 import com.mytube.web.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -37,8 +40,10 @@ public class VideoController {
     private final VideoService videoService;
     private final UploadVideo uploadVideo;
 
+    private final MemberService memberService;
+    private final ModelMapper modelMapper;
     @GetMapping("/videos")
-    public String videos(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model,
+    public String videos(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember, Model model,
                          @RequestParam Optional<Integer> page, @RequestParam Optional<String> sortBy) {
         model.addAttribute("loginMember", loginMember);
         Page<Video> videoPage = videoService.getVideoPage(PageRequest.of(
@@ -56,7 +61,7 @@ public class VideoController {
 
     @GetMapping("/videos/search")
     public String search(String keyword, Model model,
-                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember,
+                         @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember,
                          @RequestParam Optional<Integer> page,@RequestParam Optional<String> sortBy) {
         Page<Video> searchList = videoService.search(keyword, PageRequest.of(
                 page.orElse(0),
@@ -80,7 +85,7 @@ public class VideoController {
 
     @PostMapping("/videos/new")
     public String createVideo(@Valid @ModelAttribute("form") VideoCreateForm form, BindingResult result, Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) throws IOException {
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember) throws IOException {
         if (loginMember==null){
             return "redirect:/home";
         }
@@ -96,7 +101,9 @@ public class VideoController {
 
         VideoFile videoFile = uploadVideo.uploadVideoFile(form.getAttachFile());
 
-        Video video = new Video(form.getTitle(), videoFile, loginMember);
+        Member member = memberService.findMember(loginMember.getId());
+
+        Video video = new Video(form.getTitle(), videoFile, member);
         videoService.uploadVideo(video);
 
         return "redirect:/videos";
@@ -105,7 +112,7 @@ public class VideoController {
 
     @GetMapping("/videos/{id}/detail")
     public String videoDetail(@PathVariable Long id, Model model,
-                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember) {
+                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) memberDto loginMember) {
         Video video = videoService.getVideo(id);
 
 
@@ -121,7 +128,7 @@ public class VideoController {
     @GetMapping("/videos/{filename}")
     public Resource showVideo(@PathVariable String filename) throws
             MalformedURLException {
-        log.info("dasdsadsadsadsadasdasdasdasdas");
+
         return new UrlResource("file:" + uploadVideo.getFullPath(filename));
     }
 }

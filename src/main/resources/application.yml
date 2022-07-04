@@ -41,7 +41,7 @@ server:
 
 custom:
   path:
-    memberImage: 'C:\Users\ConyNeo\Desktop\mtubeFile\memberImage\'
-    videos: 'C:\Users\ConyNeo\Desktop\mtubeFile\videos\'
+    memberImage: '/Users/neo/Desktop/mtubeFile/images'
+    videos: '/Users/neo/Desktop/mtubeFile/videos'
 
 
