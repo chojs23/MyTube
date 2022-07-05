@@ -103,7 +103,7 @@ public class VideoController {
 
         Member member = memberService.findMember(loginMember.getId());
 
-        Video video = new Video(form.getTitle(), videoFile, member);
+        Video video = Video.createVideo(form.getTitle(), videoFile, member);
         videoService.uploadVideo(video);
 
         return "redirect:/videos";

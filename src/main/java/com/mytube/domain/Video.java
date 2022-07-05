@@ -29,12 +29,22 @@ public class Video extends BaseEntity {
     private Member member;
 
 
-
+    public void setMember(Member member){
+        this.member = member;
+        this.member.getVideos().add(this);
+    }
     @Builder
     public Video(String title, VideoFile attachFile, Member member) {
         this.title=title;
         this.attachFile=attachFile;
         this.member = member;
+    }
 
+    public static Video createVideo(String title, VideoFile attachFile, Member member) {
+        return Video.builder()
+                .title(title)
+                .attachFile(attachFile)
+                .member(member)
+                .build();
     }
 }

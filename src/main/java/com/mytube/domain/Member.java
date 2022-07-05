@@ -36,6 +36,9 @@ public class Member extends BaseTimeEntity {
     private List<Post> posts=new ArrayList<>();
 
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
+    private List<Comment> comments=new ArrayList<>();
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
     private List<Video> videos=new ArrayList<>();
 
     @OneToMany(mappedBy = "fromMember",cascade = CascadeType.ALL)
@@ -43,6 +46,11 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "toMember",cascade = CascadeType.ALL)
     private Set<Follow> followers = new HashSet<>();
+
+    public void addPost(Post post){
+        this.posts.add(post);
+
+    }
 
     public void updateMember(String userId,String password,String userEmail,MemberImage memberImage){
         this.userId=userId;

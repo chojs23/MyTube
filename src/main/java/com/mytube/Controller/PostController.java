@@ -56,7 +56,7 @@ public class PostController {
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
-        Page<postDto> postsDto = postPage.map(p -> new postDto(p));
+        Page<postDto> postsDto = postPage.map(postDto::createPostDtoWithoutComments);
         log.info("posts = " + postsDto);
         model.addAttribute("posts",postsDto);
 
@@ -71,7 +71,7 @@ public class PostController {
                 page.orElse(0),
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
-        Page<postDto> searchListDto = searchList.map(p -> new postDto(p));
+        Page<postDto> searchListDto = searchList.map(postDto::createPostDtoWithoutComments);
         model.addAttribute("searchList", searchListDto);
         model.addAttribute("loginMember", loginMember);
         model.addAttribute("keyword", keyword);
@@ -90,7 +90,8 @@ public class PostController {
                 10,
                 Sort.Direction.DESC,sortBy.orElse("createdDate")));
 
-        Page<postDto> postsDto = postPage.map(p -> new postDto(p));
+        Page<postDto> postsDto = postPage.map(postDto::createPostDtoWithoutComments);
+
         log.info("posts = " + postsDto);
         model.addAttribute("posts",postsDto);
 
@@ -121,11 +122,12 @@ public class PostController {
 
         Member member = memberService.findMember(loginMember.getId());
 
-        Post post = form.toEntity(form.getTitle(), form.getContent(), member);
-        Long postId = postService.createPost(post);
-        log.info("post id = " + postId);
+        Post post = Post.createPost(form.getTitle(), form.getContent(), member);
 
-        log.info("loginMember = " + loginMember);
+
+        Long postId = postService.createPost(post);
+        log.info("member's comment = "+member.getComments().size());
+        log.info("member's posts = "+member.getPosts().size());
         return "redirect:/posts";
 
     }

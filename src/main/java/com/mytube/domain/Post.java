@@ -32,6 +32,11 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Comment> comments=new ArrayList<>();
 
+
+    public void setMember(Member member){
+        this.member = member;
+        this.member.getPosts().add(this);
+    }
     public void updatePost(String title,String content){
         this.title=title;
         this.content=content;
@@ -42,7 +47,17 @@ public class Post extends BaseEntity {
         this.title=title;
         this.content=content;
         this.member=member;
+
+        this.member.getPosts().add(this);
+
     }
 
+    public static Post createPost(String title, String content, Member member) {
+        return builder()
+                .title(title)
+                .content(content)
+                .member(member)
+                .build();
+    }
 
 }

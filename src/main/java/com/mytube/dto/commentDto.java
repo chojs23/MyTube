@@ -27,19 +27,8 @@ public class commentDto {
 
     private String createdDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
-    private String lastModifiedDate=LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm"));
 
-    public Comment toEntity(){
-        Comment comments=Comment.builder()
-                .id(id)
-                .comment(comment)
-                .createdDate(createdDate)
-                .lastModifiedDate(lastModifiedDate)
-                .member(member)
-                .post(post)
-                .build();
-        return comments;
-    }
+
 
     public commentDto(Comment comment){
         this.id = comment.getId();
@@ -47,7 +36,6 @@ public class commentDto {
         this.member = comment.getMember();
         this.post = comment.getPost();
         this.createdDate = comment.getCreatedDate();
-        this.lastModifiedDate = comment.getLastModifiedDate();
 
     }
 }

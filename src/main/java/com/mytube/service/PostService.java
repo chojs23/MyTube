@@ -28,6 +28,7 @@ public class PostService {
     public Long createPost(Post post){
         log.info("new post = "+post);
         postRepository.save(post);
+
         return post.getId();
     }
 
@@ -35,16 +36,14 @@ public class PostService {
     public boolean updatePost(Long id, PostCreateForm form){
         Optional<Post> findPost = postRepository.findById(id);
 
-        if(!findPost.isPresent()){
-            log.info("isPresent false");
-            return false;
+        if(findPost.isEmpty()){
+            throw new PostNotFoundException("There is no post id = " + id);
         }
         Post post = findPost.get();
         log.info("post = " + post);
 
         post.updatePost(form.getTitle(), form.getContent());
         Post save = postRepository.save(post);
-
         log.info("save = " + save);
         return true;
     }

@@ -4,6 +4,7 @@ import com.mytube.domain.Comment;
 import com.mytube.domain.Member;
 import com.mytube.domain.Post;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class postDto {
 
@@ -36,9 +38,21 @@ public class postDto {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.member = post.getMember();
-        this.comments=post.getComments().stream().map(comment -> new commentDto(comment)).collect(Collectors.toList());
+        this.comments=post.getComments().stream().map(commentDto::new).collect(Collectors.toList());
         this.createdDate = post.getCreatedDate();
         this.lastModifiedDate = post.getLastModifiedDate();
+    }
+
+    public static postDto createPostDtoWithoutComments(Post post) {
+        return postDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .member(post.getMember())
+                .createdDate(post.getCreatedDate())
+                .lastModifiedDate(post.getLastModifiedDate())
+                .build();
+
     }
 
 }

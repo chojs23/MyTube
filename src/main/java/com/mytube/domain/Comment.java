@@ -13,7 +13,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -39,7 +38,26 @@ public class Comment {
     @CreatedDate
     @Column(name = "created_date")
     private String createdDate;
-    @LastModifiedDate
-    @Column(name = "modified_date")
-    private String lastModifiedDate;
+
+
+
+    @Builder
+    public Comment(String comment, Post post, Member member,String createdDate) {
+        this.comment = comment;
+        this.post=post;
+        this.member=member;
+        this.createdDate = createdDate;
+
+        this.member.getComments().add(this);
+        this.post.getComments().add(this);
+    }
+    public static Comment createComment(String comment,Member member,Post post,String createdDate){
+        return Comment.builder()
+                .comment(comment)
+                .member(member)
+                .post(post)
+                .createdDate(createdDate)
+                .build();
+
+    }
 }
